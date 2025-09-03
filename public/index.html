@@ -7,87 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --sci-fi-cyan: #00FFFF;
-            --sci-fi-glow: rgba(0, 255, 255, 0.5);
-            --background-dark: #0b0f14;
-        }
-        body { margin: 0; overflow: hidden; font-family: 'Fira Code', monospace; background-color: var(--background-dark); color: #fff; }
-        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: grab; }
-        #canvas-container.interactive { cursor: pointer; }
-        #canvas-container:active { cursor: grabbing; }
-        #info-panel {
-            position: absolute; top: 40px; right: 40px; width: 360px; background: rgba(10, 15, 26, 0.8);
-            border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 4px; padding: 24px;
-            backdrop-filter: blur(10px) saturate(120%); -webkit-backdrop-filter: blur(10px) saturate(120%);
-            opacity: 0; transform: scale(0.95) translateX(20px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none; color: #E0E0E0;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
-        }
-        #info-panel.visible { opacity: 1; transform: scale(1) translateX(0); pointer-events: auto; }
-        #info-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--sci-fi-cyan); }
-        #info-title { font-size: 1.2em; font-weight: 600; color: #fff; text-shadow: 0 0 5px var(--sci-fi-glow); }
-        #info-close { font-size: 1.8em; line-height: 1; cursor: pointer; color: var(--sci-fi-cyan); transition: all 0.2s; }
-        #info-close:hover { color: #fff; transform: rotate(90deg); }
-        #info-status { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8em; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; border: 1px solid; }
-        .status-Warning { border-color: #F59E0B; color: #F59E0B; text-shadow: 0 0 5px #F59E0B; }
-        .status-Critical { border-color: #EF4444; color: #EF4444; text-shadow: 0 0 5px #EF4444; }
-        .status-Good { border-color: #22C55E; color: #22C55E; text-shadow: 0 0 5px #22C55E; }
-        #info-details-grid { display: grid; grid-template-columns: 140px 1fr; gap: 12px; margin-bottom: 20px; }
-        #info-details-grid .label { color: var(--sci-fi-cyan); } .value { color: #fff; font-weight: 500; }
-        #info-description { font-size: 0.9em; line-height: 1.6; color: #ccc; }
-        #webcam-container { position: absolute; bottom: 20px; right: 20px; width: 240px; height: 180px; border: 2px solid var(--sci-fi-cyan); border-radius: 4px; box-shadow: 0 0 15px var(--sci-fi-glow); overflow: hidden; transition: opacity 0.5s; opacity: 0; pointer-events: none; }
-        #webcam-container.visible { opacity: 1; }
-        #webcam-feed, #overlay-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
-    #control-hint { position: absolute; left: 18px; top: 18px; background: rgba(0,0,0,0.45); color: var(--sci-fi-cyan); padding: 8px 12px; border-radius: 8px; font-size: 13px; pointer-events: none; box-shadow: 0 6px 18px rgba(0,0,0,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 40; }
-    /* component list panel */
-    #component-list-panel { position: absolute; left: 18px; top: 110px; width: 300px; max-height: 65vh; overflow: auto; background: linear-gradient(180deg, rgba(2,6,12,0.9), rgba(2,6,12,0.75)); border: 1px solid rgba(0,255,255,0.06); padding: 10px; border-radius: 8px; z-index: 70; box-shadow: 0 12px 40px rgba(0,0,0,0.6); }
-    #component-list-panel h3 { margin: 0 0 8px 0; font-size: 13px; color: var(--sci-fi-cyan); }
-    .component-item { display:flex; gap:8px; align-items:center; padding:8px; border-radius:6px; cursor:pointer; transition: background 180ms; }
-    .component-item:hover { background: rgba(0,255,255,0.04); }
-    .component-item .dot { width:12px; height:12px; border-radius:50%; box-shadow:0 6px 14px rgba(0,255,255,0.04) inset; }
-    .component-item .title { font-size:13px; color:#dff; font-weight:600; }
-    .component-item .subtitle { font-size:11px; color:#9fe; opacity:0.85; }
-    .component-item.active { outline: 2px solid rgba(0,255,255,0.12); background: linear-gradient(90deg, rgba(0,255,255,0.02), rgba(0,120,160,0.03)); }
-    /* arrow overlay removed */
-    #calibration-overlay { display: none; }
-    #gesture-cursor { position: fixed; width: 28px; height: 28px; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); mix-blend-mode: screen; border-radius:50%; box-shadow:0 8px 24px rgba(0,255,255,0.12); }
-    /* HUD and labels */
-    #mode-badge { position: absolute; left: 18px; top: 60px; background: rgba(0,0,0,0.6); color: #000; padding: 6px 10px; border-radius: 8px; font-weight: 700; z-index: 60; color: #00fef0; box-shadow: 0 6px 20px rgba(0,255,255,0.06); backdrop-filter: blur(6px); }
-    #help-panel { position: absolute; left: 18px; bottom: 18px; width: 320px; background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6)); padding: 10px 12px; border-radius: 10px; font-size: 13px; z-index: 55; color: #bfeff0; }
-    .marker-label { position: absolute; transform: translate(-50%, -120%); pointer-events: none; white-space: nowrap; padding: 6px 8px; border-radius: 6px; background: rgba(0,0,0,0.6); color: #e6ffff; font-weight:600; font-size:12px; text-shadow:0 2px 8px rgba(0,0,0,0.6); z-index:70; }
-    .marker-glow { filter: blur(6px); opacity: 0.9; }
-    #cal-progress { height: 8px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; margin-top:8px; }
-    #cal-progress > i { display:block; height:100%; width:0%; background: linear-gradient(90deg, rgba(0,255,255,0.9), rgba(0,180,255,0.6)); transition: width 120ms linear; }
-    #fps-counter { position: absolute; right: 18px; top: 18px; color: #0ff; background: rgba(0,0,0,0.5); padding:6px 8px; border-radius:6px; z-index:60; font-family: monospace; }
-    /* Tutorial overlay */
-    #tutorial-overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:120; }
-    #tutorial-overlay .backdrop { position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.85)); }
-    #tutorial-card { position:relative; width:640px; max-width:92%; background:rgba(6,10,18,0.95); border-radius:12px; padding:20px; color:#dff; box-shadow:0 20px 50px rgba(0,0,0,0.6); border:1px solid rgba(0,255,255,0.06); z-index:121; }
-    #tutorial-card h2 { margin:0 0 8px 0; color:var(--sci-fi-cyan); }
-    #tutorial-card p { margin:6px 0 12px 0; line-height:1.4; color:#cfe; }
-    #tutorial-controls { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-    .tutorial-btn { background:rgba(0,255,255,0.06); color:#bff; padding:8px 12px; border-radius:8px; border:1px solid rgba(0,255,255,0.06); cursor:pointer; }
-    .tutorial-btn.primary { background:linear-gradient(90deg,#00fef0,#00aaff); color:#002; font-weight:700; }
-    /* pointer demo */
-    #tutorial-pointer { position: absolute; width: 26px; height: 26px; border-radius:50%; background: rgba(0,255,255,0.95); box-shadow:0 8px 20px rgba(0,255,255,0.12); z-index:130; pointer-events:none; display:none; transform: translate(-50%,-50%); }
-    /* Improved help panel (collapsible) */
-    #help-panel { position: absolute; left: 18px; bottom: 18px; width: 320px; z-index: 55; font-size: 13px; color: #bfeff0; }
-    #help-panel .help-header { display:flex; align-items:center; justify-content:space-between; gap:8px; background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.72)); padding:10px 12px; border-radius:10px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); border:1px solid rgba(0,255,255,0.06); cursor:pointer; }
-    #help-panel .help-title { color: var(--sci-fi-cyan); font-weight:700; font-size:14px; }
-    #help-panel .icon-btn { background: transparent; border: none; color: var(--sci-fi-cyan); width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; border-radius:6px; cursor:pointer; }
-    #help-panel .icon-btn svg { transition: transform 220ms cubic-bezier(.2,.9,.2,1); }
-    #help-body { overflow: hidden; border-radius: 8px; transform-origin: top center; box-shadow: 0 8px 30px rgba(0,0,0,0.45); }
-    #help-body .help-content { background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6)); padding: 12px; border-radius: 0 0 8px 8px; color: #cfe; }
-    .help-line { margin-bottom:8px; line-height:1.45; font-size:13px; }
-    .help-controls { display:flex; gap:8px; align-items:center; margin-top:6px; }
-    .control-label { font-size:12px; color:#9fe; min-width:72px; }
-    .help-cal { margin-top:8px; }
-    .help-links { margin-top:8px; font-size:12px; opacity:0.9; }
-    #help-panel.collapsed .help-body { height: 0px !important; }
-    #help-panel.expanded .help-body { height: auto; }
-    </style>
+    <link rel="stylesheet" href="app.css">
 </head>
 <body>
     <div id="component-list-panel"><h3>Components & Health</h3><div id="component-list"></div></div>
@@ -180,6 +100,7 @@
             <div class="label">Component:</div><div id="info-component" class="value"></div>
             <div class="label">Next Maintenance:</div><div id="info-maintenance" class="value"></div>
             <div class="label">Priority:</div><div id="info-priority" class="value"></div>
+            <div class="label">Fault Code:</div><div id="info-faultcode" class="value"></div>
         </div>
         <p id="info-description"></p>
     </div>
@@ -195,17 +116,40 @@
         <canvas id="overlay-canvas"></canvas>
     </div>
     <!-- AI Chat widget (bottom-right, hidden when gesture mode is active) -->
-    <div id="ai-chat" style="position:fixed;right:20px;bottom:20px;width:340px;max-height:420px;background:linear-gradient(180deg,rgba(2,6,12,0.95),rgba(2,6,12,0.9));border-radius:10px;padding:8px;box-shadow:0 18px 50px rgba(0,0,0,0.6);z-index:160;display:none;flex-direction:column;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.03);">
-            <div style="color:var(--sci-fi-cyan);font-weight:700">AI Assistant</div>
-            <div style="font-size:12px;color:#9fe">Context: <span id="ai-chat-context">None</span></div>
+    <div id="ai-chat" style="position:fixed;right:40px;bottom:40px;width:520px;height:680px;backdrop-filter:blur(14px) saturate(140%);background:rgba(10,22,32,0.55);border:1px solid rgba(0,255,255,0.18);border-radius:18px;padding:0;box-shadow:0 28px 90px -8px rgba(0,0,0,0.65),0 0 0 1px rgba(0,255,255,0.08) inset;z-index:260;display:none;flex-direction:column;overflow:hidden;transform:translateY(18px) scale(.92);opacity:0;">
+        <div id="ai-chat-header" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid rgba(0,255,255,0.12);background:linear-gradient(90deg,rgba(0,40,60,0.55),rgba(0,20,30,0.3));user-select:none;">
+            <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                <div style="width:34px;height:34px;border-radius:10px;background:radial-gradient(circle at 30% 30%,rgba(0,255,255,0.8),rgba(0,120,180,0.25));display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px -2px rgba(0,255,255,0.6);font-size:14px;font-weight:700;color:#0ff;letter-spacing:0.5px;">AI</div>
+                <div style="display:flex;flex-direction:column;min-width:0;">
+                    <div style="font-weight:700;color:var(--sci-fi-cyan);font-size:15px;letter-spacing:0.5px;">Maintenance Intelligence Assistant</div>
+                    <div style="font-size:11px;color:#9fe;opacity:0.85;display:flex;gap:10px;flex-wrap:wrap;">
+                        <span>Context: <span id="ai-chat-context" style="color:#fff;font-weight:600;">None</span></span>
+                        <span>Backend: <span id="ai-backend-label" style="color:#fff;font-weight:600;">Azure</span></span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="ai-messages" style="padding:8px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:8px;">
-            <div style="font-size:12px;color:#9fe;opacity:0.9">Ask about the selected aircraft or mention a flight id.</div>
+        <div id="ai-messages" style="padding:16px 18px 12px 18px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;">
+            <div style="font-size:12px;color:#bfe;opacity:0.9">Ask about a flight (e.g. "A400-01 status") or type "fleet summary". Use natural language; tables will auto-format.</div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-            <input id="ai-input" type="text" placeholder="Ask about this aircraft..." style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.6);color:#dff;font-family:inherit;" />
-            <button id="ai-send" class="tutorial-btn">Send</button>
+        <div style="padding:12px 14px 16px 14px;border-top:1px solid rgba(0,255,255,0.1);display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,rgba(0,20,30,0.35),rgba(0,15,25,0.4));">
+            <div id="ai-suggestions" style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="ai-suggest" data-q="Fleet health summary" style="flex:1;min-width:140px;">Fleet health summary</button>
+                <button class="ai-suggest" data-q="Upcoming maintenance for current flight" style="flex:1;min-width:160px;">Upcoming maintenance</button>
+                <button class="ai-suggest" data-q="Critical components at risk" style="flex:1;min-width:160px;">Critical risks</button>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <textarea id="ai-input" rows="2" placeholder="Ask anything about maintenance, faults, scheduling..." style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,255,255,0.18);background:rgba(0,20,30,0.55);color:#e8faff;resize:vertical;max-height:120px;font-family:inherit;font-size:13px;line-height:1.35;outline:none;box-shadow:0 2px 6px -2px rgba(0,0,0,0.6) inset;">
+                </textarea>
+                <button id="ai-send" style="align-self:flex-end;background:linear-gradient(135deg,#00b7ff,#0078ff);border:none;color:#fff;padding:10px 18px;font-weight:600;border-radius:10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 8px 22px -6px rgba(0,120,255,0.5);">Send</button>
+            </div>
+        </div>
+    </div>
+    <div id="ai-chat-launcher" style="position:fixed;right:40px;bottom:40px;width:74px;height:74px;z-index:259;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:22px;background:radial-gradient(circle at 30% 30%,rgba(0,255,255,0.95),rgba(0,120,255,0.28));box-shadow:0 0 0 1px rgba(0,255,255,0.35),0 10px 38px -8px rgba(0,180,255,0.55),0 0 22px -2px rgba(0,255,255,0.6);backdrop-filter:blur(10px) saturate(160%);transition:transform .35s, box-shadow .4s;">
+        <div style="position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 65% 35%,rgba(255,255,255,0.22),rgba(0,0,0,0));pointer-events:none;mix-blend-mode:overlay;opacity:.8;"></div>
+        <div style="text-align:center;font-family:inherit;letter-spacing:.5px;">
+            <div style="font-size:24px;font-weight:700;color:#00242e;text-shadow:0 0 14px #0ff,0 0 30px #0af;letter-spacing:1px;">AI</div>
+            <div style="font-size:9px;font-weight:600;color:#013f54;letter-spacing:2.2px;margin-top:-2px;">ASSIST</div>
         </div>
     </div>
     <!-- Calibration overlay (positioned above webcam) -->
@@ -235,6 +179,63 @@
 
     <!-- Toast container -->
     <div id="toast-root" style="position:fixed;right:18px;top:18px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;"></div>
+
+    <!-- Squadron Health Overlay (hidden by default) -->
+    <div id="squadron-overlay" aria-hidden="true" role="dialog" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:500;">
+        <div id="squadron-backdrop" style="position:absolute;inset:0;background:radial-gradient(circle at 40% 40%,rgba(0,40,60,0.65),rgba(0,10,20,0.92));backdrop-filter:blur(22px) saturate(180%);"></div>
+    <div id="squadron-panel" style="position:relative;width:1080px;max-width:96%;max-height:90%;display:flex;flex-direction:column;background:linear-gradient(145deg,rgba(2,18,28,0.92),rgba(2,28,40,0.86));border:1px solid rgba(0,255,255,0.18);box-shadow:0 0 0 1px rgba(0,255,255,0.06) inset,0 32px 110px -24px rgba(0,0,0,0.85),0 0 80px -14px rgba(0,170,255,0.42);border-radius:30px;padding:28px 32px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-start;gap:18px;margin-bottom:18px;">
+                <div style="width:58px;height:58px;border-radius:18px;background:radial-gradient(circle at 30% 30%,rgba(0,255,255,0.85),rgba(0,120,255,0.25));display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px -2px rgba(0,255,255,0.65);font-weight:700;font-size:15px;letter-spacing:1px;color:#012733;">OPS</div>
+                <div style="flex:1;min-width:0;">
+                    <h2 style="margin:0 0 6px 0;font-size:22px;font-weight:700;letter-spacing:.5px;color:#aef;">Squadron Health Dashboard</h2>
+                    <div style="font-size:12.5px;color:#9fd;opacity:.85;display:flex;flex-wrap:wrap;gap:18px;">
+                        <span>Updated: <span id="sqh-updated">--</span></span>
+                        <span>Total Flights: <span id="sqh-total">--</span></span>
+                        <span>Critical: <span id="sqh-critical" style="color:#ff6b6b;font-weight:600;">--</span></span>
+                        <span>Warning: <span id="sqh-warning" style="color:#f6c04b;font-weight:600;">--</span></span>
+                        <span>Good: <span id="sqh-good" style="color:#4ade80;font-weight:600;">--</span></span>
+                    </div>
+                </div>
+                <button id="sqh-close" style="background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);color:#bff;padding:8px 14px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.5px;">Close (M)</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;overflow:auto;padding-right:6px;align-content:start;">
+                <!-- Status (Bar Only) -->
+                <div class="sqh-card" style="background:linear-gradient(135deg,rgba(0,40,60,0.42),rgba(0,25,40,0.38));border:1px solid rgba(0,255,255,0.18);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:260px;">
+                    <h3 style="margin:0;font-size:14px;letter-spacing:.5px;color:#9fe;font-weight:600;display:flex;align-items:center;gap:8px;">Status Distribution <span style="font-size:10px;font-weight:500;opacity:.55;">(counts)</span></h3>
+                    <canvas id="sqh-status-chart" height="170" style="width:100%;height:170px;"></canvas>
+                </div>
+                <!-- Maintenance (Bar Only) -->
+                <div class="sqh-card" style="background:linear-gradient(135deg,rgba(0,40,60,0.42),rgba(0,25,40,0.38));border:1px solid rgba(0,255,255,0.18);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:260px;">
+                    <h3 style="margin:0;font-size:14px;letter-spacing:.5px;color:#9fe;font-weight:600;">Upcoming Maintenance (≤ 60 days)</h3>
+                    <canvas id="sqh-maint-chart" height="170" style="width:100%;height:170px;"></canvas>
+                </div>
+                <!-- Critical Components List -->
+                <div class="sqh-card" style="background:linear-gradient(135deg,rgba(0,40,60,0.38),rgba(0,25,40,0.34));border:1px solid rgba(0,255,255,0.12);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:220px;">
+                    <h3 style="margin:0 0 4px 0;font-size:14px;letter-spacing:.5px;color:#9fe;font-weight:600;">Critical Components</h3>
+                    <div id="sqh-critical-list" style="font-size:12px;line-height:1.45;max-height:140px;overflow:auto;white-space:pre-wrap;color:#def;opacity:.9;">Loading…</div>
+                </div>
+                <!-- AI Summary Card -->
+                <div class="sqh-card" style="background:linear-gradient(135deg,rgba(0,40,60,0.55),rgba(0,25,40,0.42));border:1px solid rgba(0,255,255,0.22);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:230px;grid-column:1 / -1;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <h3 style="margin:0;font-size:14px;letter-spacing:.5px;color:#9fe;font-weight:600;flex:1;">AI Summary</h3>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#9fe;">
+                            <span style="opacity:.75;">Backend</span>
+                            <select id="sqh-ai-backend" style="background:rgba(0,60,80,0.5);color:#dff;border:1px solid rgba(0,255,255,0.25);border-radius:8px;padding:4px 6px;font-size:11px;cursor:pointer;">
+                                <option value="azure">Azure</option>
+                                <option value="neurosan">Neuro-SAN</option>
+                                <option value="neurosan-analysis">Neuro-SAN (Analysis)</option>
+                                <option value="auto" selected>Auto</option>
+                            </select>
+                        </label>
+                        <button id="sqh-ai-refresh" style="background:linear-gradient(135deg,#0096ff,#00d1ff);border:none;color:#fff;font-weight:600;font-size:11px;padding:6px 12px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,160,255,0.65);">Refresh</button>
+                    </div>
+                    <div id="sqh-ai-summary" style="font-size:12px;line-height:1.55;color:#dff;overflow:auto;flex:1;max-height:220px;white-space:normal;">Press Refresh for AI analysis.</div>
+                </div>
+            </div>
+            <div style="margin-top:18px;font-size:11px;opacity:.55;text-align:right;letter-spacing:.6px;">Press M to toggle • Data derived from live flight records</div>
+            <div id="sqh-glow" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 80% 120%,rgba(0,255,255,0.18),rgba(0,0,0,0));mix-blend-mode:overlay;opacity:.55;"></div>
+        </div>
+    </div>
 
     <!-- All Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -279,6 +280,232 @@
                 window.loadFlightById = function(id){ return Promise.resolve(); };
             }
         })();
+
+        // -----------------------
+        // Squadron Health Overlay (Shortcut: M)
+        // -----------------------
+        (function(){
+            const overlay = document.getElementById('squadron-overlay');
+            const closeBtn = document.getElementById('sqh-close');
+            const statusCanvas = document.getElementById('sqh-status-chart');
+            const maintCanvas = document.getElementById('sqh-maint-chart');
+            const aiSummaryEl = document.getElementById('sqh-ai-summary');
+            const aiRefreshBtn = document.getElementById('sqh-ai-refresh');
+            const criticalList = document.getElementById('sqh-critical-list');
+            const updatedEl = document.getElementById('sqh-updated');
+            const goodEl = document.getElementById('sqh-good');
+            const warnEl = document.getElementById('sqh-warning');
+            const critEl = document.getElementById('sqh-critical');
+            const totalEl = document.getElementById('sqh-total');
+            if (!overlay) return;
+            let cache = null; let cacheAt = 0;
+            let lastStats = null; // store last aggregate for AI summary
+            async function fetchAllFlights(){
+                const now = Date.now();
+                if (cache && (now - cacheAt) < 30000) return cache; // 30s cache
+                try {
+                    const listRes = await fetch('/api/flights');
+                    if (!listRes.ok) throw new Error('list');
+                    const listData = await listRes.json();
+                    const flights = listData.flights || [];
+                    const detailed = [];
+                    for (const f of flights){
+                        try {
+                            const fr = await fetch(`/api/flights/${encodeURIComponent(f.id)}`);
+                            if (fr.ok){ detailed.push(await fr.json()); }
+                        } catch(e){}
+                    }
+                    cache = detailed; cacheAt = now;
+                    return detailed;
+                } catch(e){ return []; }
+            }
+            function parseDays(str){
+                if (!str) return Infinity;
+                if (/immediate/i.test(str)) return 0;
+                const m = /([0-9]+)\s*day/i.exec(str); if (m) return parseInt(m[1]);
+                return Infinity;
+            }
+            function drawBarChart(ctx, data, colors){
+                const dpr = window.devicePixelRatio || 1;
+                const logicalW = ctx.canvas.clientWidth;
+                const logicalH = ctx.canvas.clientHeight;
+                ctx.canvas.width = logicalW * dpr; ctx.canvas.height = logicalH * dpr; ctx.scale(dpr,dpr);
+                ctx.clearRect(0,0,logicalW,logicalH);
+                const maxRaw = Math.max(1, ...data.map(d=>d.value));
+                // round up max to nice step (1,2,5 base)
+                function nice(n){ const p = Math.pow(10, Math.floor(Math.log10(n))); const d = n/p; let f; if (d<=1) f=1; else if (d<=2) f=2; else if (d<=5) f=5; else f=10; return f*p; }
+                const max = nice(maxRaw);
+                const leftPad = 34; const bottomPad = 20; const topPad = 8; const chartH = logicalH - bottomPad - topPad; const chartW = logicalW - leftPad - 8;
+                // grid lines (5)
+                ctx.strokeStyle = 'rgba(140,200,220,0.15)'; ctx.lineWidth = 1;
+                ctx.font = '10px system-ui'; ctx.fillStyle='rgba(170,230,245,0.65)'; ctx.textAlign='right'; ctx.textBaseline='middle';
+                const steps = 5; for (let i=0;i<=steps;i++){ const y = topPad + chartH - (chartH*(i/steps)); ctx.beginPath(); ctx.moveTo(leftPad, y+0.5); ctx.lineTo(leftPad+chartW, y+0.5); ctx.stroke(); const val = Math.round((max/steps)*i); ctx.fillText(val, leftPad-6, y); }
+                const barGap = 14; const barW = (chartW - (data.length+1)*barGap)/data.length;
+                data.forEach((d,i)=>{
+                    const h = (d.value / max) * chartH;
+                    const x = leftPad + barGap + i*(barW+barGap);
+                    const y = topPad + chartH - h;
+                    const grad = ctx.createLinearGradient(0,y,0,y+h);
+                    grad.addColorStop(0, colors[i][0]); grad.addColorStop(1, colors[i][1]);
+                    ctx.beginPath(); ctx.fillStyle = grad; ctx.roundRect(x,y,barW,h,6); ctx.fill();
+                    // value label
+                    ctx.fillStyle='rgba(210,255,255,0.9)'; ctx.font='600 11px system-ui'; ctx.textAlign='center'; ctx.fillText(d.value, x+barW/2, y-8);
+                    // x axis label
+                    ctx.fillStyle='rgba(185,235,245,0.8)'; ctx.font='500 11px system-ui'; ctx.fillText(d.label, x+barW/2, topPad+chartH+12);
+                });
+            }
+            function renderCritical(list){
+                if (!list.length){ criticalList.textContent = 'None'; return; }
+                criticalList.textContent = list.map(c=>`${c.id} • ${c.displayName} (${c.status})`).join('\n');
+            }
+            // Removed pie/donut charts & legends for simplicity and to prevent clipping.
+            async function generateAiSummary(){
+                if (!aiSummaryEl) return; if (!lastStats){ aiSummaryEl.textContent = 'No data yet.'; return; }
+                aiSummaryEl.classList.add('loading');
+                aiSummaryEl.innerHTML = '<div class="ai-loader" aria-label="Analyzing" role="status">\n  <div class="ring"></div>\n  <div class="arc a"></div>\n  <div class="arc b"></div>\n  <div class="dot"></div>\n</div>';
+                const selector = document.getElementById('sqh-ai-backend');
+                let chosen = selector ? selector.value : 'auto';
+                let backend = window.currentChatBackend || 'azure';
+                if (chosen === 'azure') backend = 'azure';
+                else if (chosen === 'neurosan' || chosen === 'neurosan-analysis') backend = 'neurosan';
+                // auto: prefer currently selected chat backend, fallback azure
+                let endpoint = backend === 'neurosan' ? '/api/neurosan-chat' : '/api/ai-chat';
+                const useAnalysisOverride = (chosen === 'neurosan-analysis');
+                const { statusCounts, maintBuckets, criticalComponents } = lastStats;
+                const totalAircraft = (statusCounts.Good + statusCounts.Warning + statusCounts.Critical) || 1;
+                const pct = (n)=> ((n/totalAircraft)*100).toFixed(1)+'%';
+                const maintTotal = maintBuckets['0-7']+maintBuckets['8-15']+maintBuckets['16-30']+maintBuckets['31-60'] || 1;
+                const maintPct = (n)=> ((n/maintTotal)*100).toFixed(1)+'%';
+                const riskIndex = (statusCounts.Critical*3 + statusCounts.Warning*1) / totalAircraft; // weighted simple risk index
+                const prompt = `You are an aerospace maintenance & operations analyst. Using ONLY the supplied snapshot data, produce a high‑signal, action oriented squadron health intelligence brief.
+
+RAW COUNTS: Good=${statusCounts.Good} (${pct(statusCounts.Good)}), Warning=${statusCounts.Warning} (${pct(statusCounts.Warning)}), Critical=${statusCounts.Critical} (${pct(statusCounts.Critical)}).
+MAINT WINDOWS: 0-7=${maintBuckets['0-7']} (${maintPct(maintBuckets['0-7'])}), 8-15=${maintBuckets['8-15']} (${maintPct(maintBuckets['8-15'])}), 16-30=${maintBuckets['16-30']} (${maintPct(maintBuckets['16-30'])}), 31-60=${maintBuckets['31-60']} (${maintPct(maintBuckets['31-60'])}).
+RISK INDEX (3*Critical + 1*Warning normalized)=${riskIndex.toFixed(2)}.
+CRITICAL COMPONENT SAMPLE (≤15): ${criticalComponents.slice(0,15).map(c=>c.displayName||c.id).join(', ')}
+
+TASK: Derive insights & actions. DO NOT invent history beyond reasoned inference.
+
+OUTPUT (Markdown):
+## 1. Executive Summary
+- 2–3 sentences: readiness posture, dominant risk vector, deployment confidence.
+
+## 2. Key Metrics Table
+Rows: Good, Warning, Critical, 0-7, 8-15, 16-30, 31-60, Risk Index. Columns: Metric | Count | % Fleet / % Maint | Interpretation.
+
+## 3. Risk Drivers
+≤5 bullets. Each: Driver – Impact (operational effect / exposure).
+
+## 4. Critical Component Spotlight
+Short paragraph: 2–4 components most likely to constrain availability. Justify selection.
+
+## 5. Recommended Immediate Actions
+Ordered list (≤5). Each: Action | Rationale | Expected Effect.
+
+## 6. Maintenance Focus (Next 60 Days)
+Which bucket to surge resources into first & why. Note if near-term window offers opportunity.
+
+## 7. Operational Outlook (7–14 Days)
+Classification (Stable / Guarded / Elevated / High Risk) + justification.
+
+## 8. Data Quality Note (if needed)
+Mention sparsity/anomalies if present.
+
+STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpretation. Strong verbs (Stabilize, Isolate, Accelerate, Harden). Label any assumption clearly as inference.`;
+                try {
+                    const body = { message: prompt, flightId: null, history: [], bypassLocal: true };
+                    if (backend==='neurosan' && useAnalysisOverride && window.__APP_CONFIG__?.neuroSanSummaryProjectConfigured) {
+                        body.projectOverride = window.__APP_CONFIG__.neuroSanSummaryProjectName;
+                    }
+                    let r = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+                    let j = await r.json().catch(()=>null);
+                    // If Neuro-SAN selected and returns 404 or explicit error, fallback to Azure automatically
+                    if ((!r.ok && backend==='neurosan' && r.status===404) || (backend==='neurosan' && j && (j.error||j.detail))) {
+                        backend = 'azure'; endpoint = '/api/ai-chat';
+                        aiSummaryEl.innerHTML = '<em style="opacity:.7;">Neuro-SAN unavailable, falling back to Azure…</em>';
+                        r = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message: prompt, flightId: null, history: [], bypassLocal: true }) });
+                        j = await r.json().catch(()=>null);
+                    }
+                    if (r.ok && j && j.reply){
+                        aiSummaryEl.classList.remove('loading');
+                        if (typeof renderMarkdown === 'function') {
+                            aiSummaryEl.innerHTML = renderMarkdown(j.reply);
+                        } else {
+                            aiSummaryEl.innerHTML = j.reply.replace(/\n/g,'<br>');
+                        }
+                        // Persist summary to cache API
+                        try { fetch('/api/ai-summary-cache', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ summary: j.reply, backend, project: window.__APP_CONFIG__?.neuroSanSummaryProjectName || null, stats: lastStats }) }); } catch(e){}
+                        if (useAnalysisOverride && backend==='neurosan' && !window.__APP_CONFIG__?.neuroSanSummaryProjectConfigured){
+                            aiSummaryEl.innerHTML += '<div style="margin-top:8px;font-size:11px;opacity:.6;">(Analysis project not configured server-side; used canonical project instead)</div>';
+                        }
+                    }
+                    else { aiSummaryEl.classList.remove('loading'); aiSummaryEl.textContent = 'AI summary failed: ' + (j && (j.detail||j.error) || r.status); }
+                } catch(e){ aiSummaryEl.classList.remove('loading'); aiSummaryEl.textContent = 'AI summary error: ' + e; }
+            }
+            if (aiRefreshBtn) aiRefreshBtn.addEventListener('click', generateAiSummary);
+            // Load cached summary on first open
+            let __summaryLoaded = false;
+            async function loadCachedSummary(){
+                if (__summaryLoaded) return; __summaryLoaded = true;
+                try {
+                    const r = await fetch('/api/ai-summary-cache'); if (!r.ok) return;
+                    const j = await r.json(); if (j && j.summary && aiSummaryEl){
+                        aiSummaryEl.innerHTML = (typeof renderMarkdown==='function')? renderMarkdown(j.summary): j.summary.replace(/\n/g,'<br>');
+                    }
+                } catch(e){}
+            }
+            async function populate(){
+                const flights = await fetchAllFlights();
+                const statusCounts = { Good:0, Warning:0, Critical:0 };
+                const maintBuckets = { '0-7':0,'8-15':0,'16-30':0,'31-60':0 };
+                const criticalComponents = [];
+                flights.forEach(f=>{
+                    (f.components||[]).forEach(c=>{
+                        if (/critical/i.test(c.status)) criticalComponents.push({ id: f.id+':'+c.id, displayName: c.displayName||c.componentName||c.id, status:c.status });
+                        const d = parseDays(c.maintenanceDue);
+                        if (d <= 7) maintBuckets['0-7']++; else if (d <=15) maintBuckets['8-15']++; else if (d<=30) maintBuckets['16-30']++; else if (d<=60) maintBuckets['31-60']++;
+                        if (/critical/i.test(c.status)) statusCounts.Critical++; else if (/warning/i.test(c.status)) statusCounts.Warning++; else statusCounts.Good++;
+                    });
+                });
+                totalEl.textContent = flights.length;
+                goodEl.textContent = statusCounts.Good;
+                warnEl.textContent = statusCounts.Warning;
+                critEl.textContent = statusCounts.Critical;
+                updatedEl.textContent = new Date().toLocaleTimeString();
+                // Persist stats for AI
+                lastStats = { statusCounts, maintBuckets, criticalComponents };
+                // Draw charts
+                if (statusCanvas){
+                    const ctx = statusCanvas.getContext('2d');
+                    drawBarChart(ctx,[{label:'Good',value:statusCounts.Good},{label:'Warn',value:statusCounts.Warning},{label:'Crit',value:statusCounts.Critical}], [ ['#1de5b6','#036b52'], ['#ffd35a','#8a6200'], ['#ff6b6b','#7a0018'] ]);
+                }
+                if (maintCanvas){
+                    const ctx2 = maintCanvas.getContext('2d');
+                    drawBarChart(ctx2,[{label:'0-7',value:maintBuckets['0-7']},{label:'8-15',value:maintBuckets['8-15']},{label:'16-30',value:maintBuckets['16-30']},{label:'31-60',value:maintBuckets['31-60']}], [ ['#42e6ff','#126b7a'], ['#3dd6ff','#125a6b'], ['#24b4ff','#0d4d80'], ['#148eff','#063a72'] ]);
+                }
+                // Pie charts removed.
+                renderCritical(criticalComponents.slice(0,25));
+            }
+            function show(){ if (overlay.style.display==='flex') return; overlay.style.display='flex'; overlay.setAttribute('aria-hidden','false'); populate(); loadCachedSummary(); }
+            function hide(){ if (overlay.style.display==='none') return; overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }
+            function toggle(){ (overlay.style.display==='flex') ? hide() : show(); }
+            if (closeBtn) closeBtn.addEventListener('click', toggle);
+            overlay.addEventListener('click', e=>{ if (e.target===overlay || e.target.id==='squadron-backdrop') hide(); });
+            window.addEventListener('keydown', (e)=>{
+                if (e.key==='m' || e.key==='M') {
+                    const active = document.activeElement; const tag = active && active.tagName; if (tag==='INPUT' || tag==='TEXTAREA' || active?.isContentEditable) return; // ignore while typing
+                    e.preventDefault(); toggle();
+                }
+            });
+        })();
+    </script>
+
+    <!-- Fetch lightweight runtime config (summary analysis project availability) -->
+    <script>
+        (async function(){
+            try { const r = await fetch('/api/app-config'); if (r.ok) { window.__APP_CONFIG__ = await r.json(); } }
+            catch(e){ window.__APP_CONFIG__ = {}; }
+        })();
     </script>
 
     <script type="module">
@@ -293,50 +520,62 @@
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000);
         const initialCameraPosition = new THREE.Vector3();
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    // increase exposure so the lit aircraft appears more prominent against the dark background
-    renderer.toneMappingExposure = 1.25;
-        renderer.outputEncoding = THREE.sRGBEncoding;
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    // Slightly higher exposure for brighter overall appearance
+    renderer.toneMappingExposure = 1.35;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    // Enable soft shadows (kept very subtle)
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         canvasContainer.appendChild(renderer.domElement);
  
     // darker grey background for high contrast and to match UI
     scene.background = new THREE.Color(0x0b0f14);
 
-    // soft ambient + hemisphere for cool sci-fi rim (increased to make model more visible)
-    const ambient = new THREE.AmbientLight(0x0a1116, 0.9);
+    // --- Brighter, low-contrast lighting setup ---
+    // Stronger ambient to lift shadowed areas
+    const ambient = new THREE.AmbientLight(0x0e1820, 1.35);
     scene.add(ambient);
-    const hemisphereLight = new THREE.HemisphereLight(0x1b86a8, 0x071018, 1.1);
+    // Hemisphere for soft environmental wrap (higher intensity for brightness, warmer ground tint to neutralize cool shadows)
+    const hemisphereLight = new THREE.HemisphereLight(0x9fdfff, 0x1a242c, 1.6);
     hemisphereLight.position.set(0, 1, 0);
     scene.add(hemisphereLight);
 
-    // main directional key light (soft shadows) — boosted intensity and slightly shifted for stronger key
-    const dirLight = new THREE.DirectionalLight(0x9feeff, 2.8);
-    dirLight.position.set(4000, 9000, 5000);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.set(2048, 2048);
-        dirLight.shadow.camera.near = 1;
-        dirLight.shadow.camera.far = 30000;
-        // enlarge orthographic camera for broad shadow coverage (values are generous and later clamped by scene extents)
-        const shCam = dirLight.shadow.camera;
-        shCam.left = -12000; shCam.right = 12000; shCam.top = 12000; shCam.bottom = -12000;
+    // Key directional light (reduced intensity, softened shadow influence)
+    const dirLight = new THREE.DirectionalLight(0xdff6ff, 1.6);
+    dirLight.position.set(3500, 8000, 4200);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.set(1024, 1024); // smaller to keep shadows soft / less defined
+    dirLight.shadow.camera.near = 10;
+    dirLight.shadow.camera.far = 25000;
+    const shCam = dirLight.shadow.camera;
+    shCam.left = -9000; shCam.right = 9000; shCam.top = 9000; shCam.bottom = -9000;
+    dirLight.shadow.bias = -0.0002;
+    dirLight.shadow.normalBias = 0.4;
     scene.add(dirLight);
 
-    // Additional fill and rim lights to make the aircraft stand out from the dark background
-    const fillLightFront = new THREE.PointLight(0xbfeeff, 0.55, 25000);
-    fillLightFront.position.set(0, 3000, 10000); // in front of the model/camera to illuminate details
-    scene.add(fillLightFront);
+    // Broad area-style fill using a second (non-shadow) directional to wash remaining dark zones
+    const fillDir = new THREE.DirectionalLight(0xb0e8ff, 0.9);
+    fillDir.position.set(-6000, 5000, -3000);
+    scene.add(fillDir);
 
-    const rimLightBack = new THREE.PointLight(0x66ddff, 0.45, 28000);
-    rimLightBack.position.set(-12000, 6000, -10000); // subtle back rim
+    // Subtle rim accent (reduced distance & intensity for less contrast)
+    const rimLightBack = new THREE.PointLight(0x66ddff, 0.25, 22000);
+    rimLightBack.position.set(-9000, 5000, -6000);
     scene.add(rimLightBack);
 
-    // small warm kicker to separate underside details
-    const kicker = new THREE.PointLight(0xffeebb, 0.18, 18000);
-    kicker.position.set(6000, -3000, 2000);
+    // Gentle warm underside lift (slightly stronger to cancel blue cast)
+    const kicker = new THREE.PointLight(0xffddbb, 0.28, 20000);
+    kicker.position.set(5500, -3500, 1800);
     scene.add(kicker);
+
+    // Optional: faint forward fill to brighten nose area
+    const frontal = new THREE.PointLight(0xc8f2ff, 0.35, 16000);
+    frontal.position.set(2000, 2500, 9000);
+    scene.add(frontal);
 
         // subtle starfield as distant points (low opacity)
         (function addStars(){
@@ -402,6 +641,18 @@
                if (!res.ok) throw new Error('flight not found');
                const payload = await res.json();
                let comps = (payload.components || []);
+               // Ensure each component has a faultCode. If flights.json already provides one, keep it.
+               // Otherwise assign a deterministic ER### code based on component index in the flight.
+               let assignedFaultCodes = false;
+               comps = (comps || []).map((c, i) => {
+                   if (!c) return c;
+                   if (!c.faultCode) {
+                       const idx = String(i + 1).padStart(3, '0');
+                       c.faultCode = `ER${idx}`;
+                       assignedFaultCodes = true;
+                   }
+                   return c;
+               });
 
                // If no components present for this flight, attempt to copy from a template (A400-01)
                if (!comps || comps.length === 0) {
@@ -426,6 +677,21 @@
 
                componentData = comps;
                localStorage.setItem('selectedFlight', id);
+               // If we newly assigned fault codes, persist the updated flight back to the server so
+               // future loads will include the saved faultCode values.
+               if (assignedFaultCodes) {
+                   (async () => {
+                       try {
+                           const savePayload = { id: id, displayName: payload.displayName || id, components: comps };
+                           const saveRes = await fetch(`/api/flights/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savePayload) });
+                           if (saveRes && saveRes.ok) {
+                               console.info && console.info('persisted fault codes for', id);
+                           } else {
+                               console.warn('failed to persist generated fault codes for', id, saveRes && saveRes.status);
+                           }
+                       } catch (err) { console.warn('persisting fault codes failed', err); }
+                   })();
+               }
                // rebuild markers live without reloading
                try {
                    // compute model size for reasonable marker scaling
@@ -490,25 +756,66 @@
         // --- INTERACTIVE ELEMENTS ---
     let aircraftModel, markers = [], markerAnchors = [], markerColliders = [], hoveredObject = null, selectedObject = null, pendingMarkerCreate = null;
         const statusColors = { 'Good': '#22C55E', 'Warning': '#F59E0B', 'Critical': '#EF4444' };
-        
+
     function createScannerTexture(color) {
-            // smaller canvas so the sprite texture is less visually large
-            const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
-            const ctx = canvas.getContext('2d'); const texture = new THREE.CanvasTexture(canvas);
-            let rotation = 0;
-            function animateScanner() {
-                rotation += 0.06;
-                ctx.clearRect(0, 0, 64, 64);
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 4;
-                const pulse = Math.sin(Date.now() * 0.006) * 2 + 26;
-                ctx.beginPath(); ctx.arc(32, 32, pulse, 0, 2 * Math.PI); ctx.stroke();
-                ctx.save(); ctx.translate(32, 32); ctx.rotate(rotation);
-                ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.moveTo(0, -10); ctx.lineTo(0, 10);
-                ctx.stroke(); ctx.restore(); texture.needsUpdate = true;
-            }
-            return { texture, animate: animateScanner };
+        const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128;
+        const ctx = canvas.getContext('2d'); const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = 4; texture.needsUpdate = true;
+        let rotation = 0;
+        function animateScanner() {
+            rotation += 0.04;
+            ctx.clearRect(0,0,128,128);
+            const t = Date.now()*0.0015;
+            const grd = ctx.createRadialGradient(64,64,8,64,64,60);
+            grd.addColorStop(0, hexToRgba(color,0.35));
+            grd.addColorStop(0.6, hexToRgba(color,0.08));
+            grd.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(64,64,60,0,Math.PI*2); ctx.fill();
+            const pulseR = 30 + Math.sin(t*2.2)*6;
+            ctx.strokeStyle = color; ctx.lineWidth = 4.5; ctx.beginPath(); ctx.arc(64,64,pulseR,0,Math.PI*2); ctx.stroke();
+            ctx.save(); ctx.translate(64,64); ctx.rotate(rotation);
+            ctx.strokeStyle = hexToRgba(color,0.85); ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(0,0,46,Math.PI*0.15,Math.PI*0.55); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0,0,46,-Math.PI*0.35,-Math.PI*0.05); ctx.stroke();
+            ctx.restore();
+            ctx.save(); ctx.translate(64,64); ctx.rotate(rotation*1.4);
+            ctx.strokeStyle = hexToRgba(color,0.9); ctx.lineWidth = 1.8;
+            ctx.beginPath(); ctx.moveTo(-12,0); ctx.lineTo(12,0); ctx.moveTo(0,-12); ctx.lineTo(0,12); ctx.stroke();
+            ctx.restore();
+            texture.needsUpdate = true;
         }
+        return { texture, animate: animateScanner };
+    }
+
+    function hexToRgba(hex, a){
+        if (!hex) return 'rgba(255,255,255,'+a+')';
+        const c = hex.replace('#','');
+        const bigint = parseInt(c,16);
+        const r = (c.length===3)? (parseInt(c[0]+c[0],16)) : (bigint>>16)&255;
+        const g = (c.length===3)? (parseInt(c[1]+c[1],16)) : (bigint>>8)&255;
+        const b = (c.length===3)? (parseInt(c[2]+c[2],16)) : bigint&255;
+        return `rgba(${r},${g},${b},${a})`;
+    }
+
+    function createAuraSprite(baseScale, color){
+        const c = document.createElement('canvas'); c.width=256; c.height=256; const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(128,128,10,128,128,120);
+        g.addColorStop(0, hexToRgba(color,0.55));
+        g.addColorStop(0.35, hexToRgba(color,0.15));
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(128,128,122,0,Math.PI*2); ctx.fill();
+        const tex = new THREE.CanvasTexture(c); tex.needsUpdate = true;
+        const mat = new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, transparent:true, depthTest:false, opacity:0.55 });
+        const spr = new THREE.Sprite(mat); spr.scale.set(baseScale*4.2, baseScale*4.2, 1); return spr;
+    }
+
+    function createRippleSprite(color){
+        const c = document.createElement('canvas'); c.width=256; c.height=256; const ctx = c.getContext('2d');
+        ctx.strokeStyle = hexToRgba(color,0.9); ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(128,128,110,0,Math.PI*2); ctx.stroke();
+        const tex = new THREE.CanvasTexture(c); tex.needsUpdate = true;
+        const mat = new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, transparent:true, depthTest:false, opacity:0 });
+        const spr = new THREE.Sprite(mat); spr.scale.set(1,1,1); return spr;
+    }
 
         // Clear all markers, anchors, colliders, and DOM labels
         function clearMarkers() {
@@ -537,8 +844,8 @@
                 const { texture, animate } = createScannerTexture(statusColors[data.status]);
                 const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, sizeAttenuation: true });
                 const marker = new THREE.Sprite(material);
-                const baseMarkerSize = Math.max((maxDim * 0.005), 4);
-                const visualMarkerSize = baseMarkerSize * 2;
+                const baseMarkerSize = Math.max((maxDim * 0.0065), 5);
+                const visualMarkerSize = baseMarkerSize * 2.4;
                 marker.scale.set(visualMarkerSize, visualMarkerSize, 1);
                 marker.userData.baseScale = visualMarkerSize;
                 marker.userData.componentInfo = data;
@@ -562,17 +869,20 @@
                 const glowCanvas = document.createElement('canvas'); glowCanvas.width = 64; glowCanvas.height = 64;
                 const gctx = glowCanvas.getContext('2d'); gctx.fillStyle = '#00ffff'; gctx.beginPath(); gctx.arc(32,32,18,0,Math.PI*2); gctx.fill();
                 const glowTex = new THREE.CanvasTexture(glowCanvas);
-                const glowMat = new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, opacity: 0.9 });
-                const glow = new THREE.Sprite(glowMat); glow.scale.set(marker.userData.baseScale * 1.8, marker.userData.baseScale * 1.8, 1);
+                const glowMat = new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthTest: false, transparent: true, opacity: 0.95 });
+                const glow = new THREE.Sprite(glowMat); glow.scale.set(marker.userData.baseScale * 2.1, marker.userData.baseScale * 2.1, 1);
 
                 const ringCanvas = document.createElement('canvas'); ringCanvas.width = 128; ringCanvas.height = 128;
                 const rctx = ringCanvas.getContext('2d'); rctx.clearRect(0,0,128,128); rctx.strokeStyle = 'rgba(0,255,255,0.85)'; rctx.lineWidth = 6; rctx.beginPath(); rctx.arc(64,64,44,0,Math.PI*2); rctx.stroke();
                 const ringTex = new THREE.CanvasTexture(ringCanvas);
                 const ringMat = new THREE.SpriteMaterial({ map: ringTex, transparent: true, opacity: 0.0, depthTest: false });
-                const ring = new THREE.Sprite(ringMat); ring.scale.set(marker.userData.baseScale * 3.2, marker.userData.baseScale * 3.2, 1);
+                const ring = new THREE.Sprite(ringMat); ring.scale.set(marker.userData.baseScale * 3.6, marker.userData.baseScale * 3.6, 1);
+
+                const aura = createAuraSprite(marker.userData.baseScale, statusColors[data.status]);
+                const ripple = createRippleSprite(statusColors[data.status]);
 
                 scene.add(marker); marker.userData.anchor = anchor; markers.push(marker);
-                anchor.add(glow); anchor.add(ring);
+                anchor.add(glow); anchor.add(ring); anchor.add(aura); anchor.add(ripple);
 
                 const label = document.createElement('div'); label.className = 'marker-label'; label.innerText = data.displayName; label.style.display = 'none';
                 const teleCanvas = document.createElement('canvas'); teleCanvas.width = 80; teleCanvas.height = 18; teleCanvas.style.display = 'block'; teleCanvas.style.marginTop = '6px'; teleCanvas.style.borderRadius = '3px';
@@ -589,7 +899,7 @@
                     }
                 });
 
-                marker.userData.glow = glow; marker.userData.labelEl = label; marker.userData.tele = marker.userData.telemetry; marker.userData.selectRing = ring;
+                marker.userData.glow = glow; marker.userData.labelEl = label; marker.userData.tele = marker.userData.telemetry; marker.userData.selectRing = ring; marker.userData.aura = aura; marker.userData.ripple = ripple;
             });
             try { populateComponentList(); } catch(e) { console.warn('populateComponentList failed', e); }
             pendingMarkerCreate = null;
@@ -771,6 +1081,11 @@
             // show/hide webcam overlay and enable controls accordingly
             if (mode === 'gesture') { webcamContainer.classList.add('visible'); controls.enabled = false; }
             else { webcamContainer.classList.remove('visible'); controls.enabled = true; }
+            // Show/hide AI chat widget based on control mode
+            const aiChatWidget = document.getElementById('ai-chat');
+            if (aiChatWidget) {
+                aiChatWidget.style.display = mode === 'gesture' ? 'none' : 'flex';
+            }
             // subtle feedback
             gsap.fromTo(controlHint, { y: -6, opacity: 0.6 }, { y: 0, opacity: 0.95, duration: 0.35, ease: 'power2.out' });
         }
@@ -1111,7 +1426,7 @@
                     if (hoveredObject) {
                         gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale, y: hoveredObject.userData.baseScale, duration: 0.18 });
                         if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 1.8, y: hoveredObject.userData.baseScale * 1.8, duration: 0.22 });
-                        if (hoveredObject.userData.labelEl) gsap.to(hoveredObject.userData.labelEl, { opacity: 0, duration: 0.22, onComplete: () => hoveredObject.userData.labelEl.style.display = 'none' });
+                        if (hoveredObject.userData.labelEl) gsap.to(hoveredObject.userData.labelEl, { opacity: 0, duration: 0.25, onComplete: () => hoveredObject.userData.labelEl.style.display = 'none' });
                     }
                     hoveredObject = hoveredCandidate;
                     if (hoveredObject) {
@@ -1328,17 +1643,15 @@
             if (hoveredObject !== newHoveredObject) {
                 if (hoveredObject) {
                     gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale, y: hoveredObject.userData.baseScale, duration: 0.2 });
-                    // shrink glow and fade label
-                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 1.8, y: hoveredObject.userData.baseScale * 1.8, duration: 0.3 });
+                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 2.1, y: hoveredObject.userData.baseScale * 2.1, duration: 0.3 });
+                    if (hoveredObject.userData.aura) gsap.to(hoveredObject.userData.aura.material, { opacity:0.55, duration:0.3 });
                     if (hoveredObject && hoveredObject.userData && hoveredObject.userData.labelEl) { const _lbl = hoveredObject.userData.labelEl; gsap.to(_lbl, { opacity: 0, duration: 0.25, onComplete: () => { try { _lbl.style.display = 'none'; } catch(e){} } }); }
                 }
                 hoveredObject = newHoveredObject;
                 if (hoveredObject) {
-                    // grow modestly on hover (50% larger)
-                    gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale * 1.5, y: hoveredObject.userData.baseScale * 1.5, duration: 0.2 });
-                    // animate glow bigger
-                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 2.6, y: hoveredObject.userData.baseScale * 2.6, duration: 0.3 });
-                    // show label with fade
+                    gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale * 1.6, y: hoveredObject.userData.baseScale * 1.6, duration: 0.22, ease:'power2.out' });
+                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 2.8, y: hoveredObject.userData.baseScale * 2.8, duration: 0.32 });
+                    if (hoveredObject.userData.aura) gsap.to(hoveredObject.userData.aura.material, { opacity:0.75, duration:0.35 });
                     if (hoveredObject.userData.labelEl) { hoveredObject.userData.labelEl.style.display = 'block'; gsap.fromTo(hoveredObject.userData.labelEl, { opacity: 0 }, { opacity: 1, duration: 0.28 }); }
                     canvasContainer.classList.add('interactive');
                 } else {
@@ -1362,17 +1675,34 @@
                 // toggle selection ring visual
                 if (selectedObject && selectedObject.userData && selectedObject.userData.selectRing) {
                     gsap.to(selectedObject.userData.selectRing.material, { opacity: 0.0, duration: 0.25 });
+                    if (selectedObject.userData.aura) gsap.to(selectedObject.userData.aura.material, { opacity:0.55, duration:0.3 });
                 }
                 selectedObject = hoveredObject;
                 if (selectedObject && selectedObject.userData && selectedObject.userData.selectRing) {
                     gsap.to(selectedObject.userData.selectRing.material, { opacity: 1.0, duration: 0.28 });
+                    const m = selectedObject;
+                    const tl = gsap.timeline();
+                    tl.to(m.scale, { x: m.userData.baseScale*2.2, y: m.userData.baseScale*2.2, duration:0.18, ease:'power3.out'})
+                      .to(m.scale, { x: m.userData.baseScale*1.7, y: m.userData.baseScale*1.7, duration:0.28, ease:'power2.out'}, '>-0.02');
+                    if (m.userData.glow) {
+                        tl.to(m.userData.glow.scale, { x:m.userData.baseScale*3.2, y:m.userData.baseScale*3.2, duration:0.22, ease:'sine.out'}, 0)
+                          .to(m.userData.glow.scale, { x:m.userData.baseScale*2.6, y:m.userData.baseScale*2.6, duration:0.35, ease:'power2.out'}, '>-0.05');
+                    }
+                    if (m.userData.aura) {
+                        gsap.to(m.userData.aura.material, { opacity:0.95, duration:0.25, ease:'power2.out'});
+                    }
+                    if (m.userData.ripple) {
+                        m.userData.ripple.material.opacity = 0.9;
+                        m.userData.ripple.scale.set(m.userData.baseScale*0.5, m.userData.baseScale*0.5, 1);
+                        gsap.to(m.userData.ripple.scale, { x:m.userData.baseScale*5.4, y:m.userData.baseScale*5.4, duration:0.75, ease:'expo.out'});
+                        gsap.to(m.userData.ripple.material, { opacity:0, duration:0.75, ease:'power1.out' });
+                    }
                 }
                 
                 const targetPosition = new THREE.Vector3();
                 hoveredObject.userData.anchor.getWorldPosition(targetPosition);
                 
                 if (SLIDER_ONLY_CAMERA) {
-                    // only update the focus target; do not move camera position (preserve user slider distance)
                     controls.enabled = false;
                     gsap.to(controls.target, { x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, duration: 0.9, ease: 'power3.inOut', onComplete: () => { controls.enabled = true; } });
                 } else {
@@ -1411,11 +1741,21 @@
                 gsap.fromTo("#info-component", {innerText: ""}, { duration: 0.5, text: data.componentName, ease: "none" });
                 gsap.fromTo("#info-maintenance", {innerText: ""}, { duration: 0.5, text: data.maintenanceDue, ease: "none" });
                 gsap.fromTo("#info-priority", {innerText: ""}, { duration: 0.5, text: data.priorityLevel, ease: "none" });
+                gsap.fromTo("#info-faultcode", {innerText: ""}, { duration: 0.5, text: data.faultCode || '', ease: "none" });
                 gsap.fromTo("#info-description", {innerText: ""}, { duration: 1.0, text: data.descriptionText, ease: "none" });
+
+                // small debug: log the faultCode that we're attempting to show (helps diagnose visibility issues)
+                try { console.debug && console.debug('updateInfoPanel faultCode:', data && data.faultCode); } catch(e) {}
 
                 infoPanel.classList.add('visible');
             }, 100);
         }
+
+        // Define aiMessages in the global scope to ensure accessibility
+        const aiMessages = document.getElementById('ai-messages');
+
+        // Ensure aiHistory is globally accessible
+        let aiHistory = [];
 
         // --- EVENT LISTENERS ---
         window.addEventListener('pointermove', (e) => { if (controlMode === 'mouse') onPointerMove(e); });
@@ -1623,6 +1963,78 @@
         const tutorialSkip = document.getElementById('tutorial-skip');
         const tutorialPointer = document.getElementById('tutorial-pointer');
 
+        // Tutorial steps definition (text + optional spotlight element selector)
+        const tutorialSteps = [
+            { text: 'Welcome aboard. This guided tour orients you to navigation, gesture control, calibration, subsystem markers, AI insights, and health analytics. Use ← / → to move, Esc to exit.', spot: null },
+            { text: '3D Navigation: Left-drag rotates orbit, right-drag (or Ctrl+drag) pans, mouse wheel or distance slider zooms. Press R to reset focus, F to frame the last selected component.', spot: '#canvas-container' },
+            { text: 'Interaction Modes: Mouse vs Gesture. Toggle Gesture Mode to enable mid‑air pointing. A cyan cursor mirrors your index fingertip. Keep your hand ~40–70cm from camera for best tracking.', spot: '#mode-gesture' },
+            { text: 'Gesture Calibration (Learn): Click Learn then follow the on‑screen phases (Warmup → Slow sweep → Fast flick). The system samples motion speed percentiles to auto‑tune sensitivity & smoothing.', spot: '#learn-cal' },
+            { text: 'Subsystem Markers: Pulsing icons identify components. Hover (mouse) or dwell (gesture) to reveal label & mini telemetry sparkline. Click / Pinch‑select to focus and open the detail panel.', spot: '.marker-label' },
+            { text: 'Detail Panel: After selection, right panel animates in with status, maintenance due, priority, and fault codes. Use Esc to close or click another marker to switch context.', spot: '#info-panel' },
+            { text: 'AI Assistant & Summary: Open the AI chat to ask diagnostic or what‑if questions. The Summary tab synthesizes fleet health with Markdown tables (Good / Warning / Critical). Choose backend if available.', spot: '#chat-panel' },
+            { text: 'Health Dashboard: Aggregated fleet metrics update per loaded flight—bar distributions, trends, and AI narrative giving maintenance prioritization guidance.', spot: '#dashboard-panel' },
+            { text: 'Gesture Tuner: Fine‑tune thresholds (Zoom scale, Pinch enter/leave, Sensitivity, Precision mode). Changes persist. Use for specialized environments (gloves, lighting).', spot: '#gesture-tuner' },
+            { text: 'Re-run Tour & Utilities: Use Show tour anytime for refresher; List model nodes to inspect raw scene graph; Test mode overlays pixel sampling; Toggle gesture debug for cursor diagnostics.', spot: '#reopen-tour' }
+        ];
+        let tutorialIndex = 0;
+
+        function positionPointerFor(step){
+            const pointer = tutorialPointer; if (!pointer) return;
+            if (!step || !step.spot) { pointer.style.opacity = 0; return; }
+            const el = document.querySelector(step.spot);
+            if (!el) { pointer.style.opacity = 0; return; }
+            const rect = el.getBoundingClientRect();
+            pointer.style.opacity = 1;
+            pointer.style.left = (rect.left + rect.width/2) + 'px';
+            pointer.style.top = (rect.top + rect.height/2) + 'px';
+        }
+
+        function renderTutorial(){
+            const step = tutorialSteps[tutorialIndex];
+            tutorialText.innerText = step.text;
+            // progress dots
+            const prog = document.getElementById('tutorial-progress');
+            if (prog) {
+                prog.innerHTML = tutorialSteps.map((_,i)=>`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 3px;${i===tutorialIndex?'background:#00fef0;':'background:#144;'}"></span>`).join('');
+            }
+            tutorialPrev.disabled = tutorialIndex===0;
+            tutorialNext.innerText = (tutorialIndex === tutorialSteps.length-1) ? 'Finish' : 'Next';
+            positionPointerFor(step);
+        }
+
+        function openTutorial(resetSeen=false){
+            if (resetSeen) { try { localStorage.removeItem(TUTORIAL_KEY); } catch(e){} }
+            tutorialIndex = 0; tutorialOverlay.style.display = 'block';
+            requestAnimationFrame(()=>{ tutorialOverlay.classList.add('visible'); renderTutorial(); });
+        }
+
+        function closeTutorial(){
+            tutorialOverlay.classList.remove('visible');
+            setTimeout(()=>{ tutorialOverlay.style.display = 'none'; }, 300);
+            try { localStorage.setItem(TUTORIAL_KEY, '1'); } catch(e){}
+            tutorialPointer.style.opacity = 0;
+        }
+
+        tutorialNext.addEventListener('click', ()=>{
+            if (tutorialIndex < tutorialSteps.length-1) { tutorialIndex++; renderTutorial(); }
+            else { closeTutorial(); }
+        });
+        tutorialPrev.addEventListener('click', ()=>{ if (tutorialIndex>0) { tutorialIndex--; renderTutorial(); } });
+        tutorialSkip.addEventListener('click', ()=>{ closeTutorial(); });
+        document.addEventListener('keydown', (e)=>{
+            if (tutorialOverlay.classList.contains('visible')) {
+                if (e.key==='ArrowRight') { tutorialNext.click(); }
+                else if (e.key==='ArrowLeft') { tutorialPrev.click(); }
+                else if (e.key==='Escape') { closeTutorial(); }
+            }
+        });
+        // Reopen tour link
+        const reopen = document.getElementById('reopen-tour');
+        if (reopen) reopen.addEventListener('click', (e)=>{ e.preventDefault(); openTutorial(true); });
+
+        // Auto-open first time
+        try { if (!localStorage.getItem(TUTORIAL_KEY)) { setTimeout(()=>openTutorial(), 800); } } catch(e){}
+
         // lightweight in-page debug panel for gesture cursor visibility and coordinates
         let gestureDebugPanel = document.getElementById('gesture-debug');
         if (!gestureDebugPanel) {
@@ -1815,337 +2227,300 @@
         }
 
         // -----------------------
-        // AI Chat widget wiring
-        // -----------------------
-        const aiChat = document.getElementById('ai-chat');
-        const aiMessages = document.getElementById('ai-messages');
-        const aiInput = document.getElementById('ai-input');
-        const aiSend = document.getElementById('ai-send');
-        const aiContext = document.getElementById('ai-chat-context');
-        let aiHistory = [];
-
-        function renderMessage(role, text) {
-            const el = document.createElement('div');
-            el.style.fontSize = '13px'; el.style.padding = '8px'; el.style.borderRadius = '8px'; el.style.maxWidth = '100%';
-            if (role === 'user') { el.style.alignSelf = 'flex-end'; el.style.background = 'linear-gradient(90deg,#00fef0,#00aaff)'; el.style.color = '#002'; el.innerText = text; }
-            else { el.style.alignSelf = 'flex-start'; el.style.background = 'rgba(0,0,0,0.45)'; el.style.color = '#dff'; el.innerText = text; }
-            aiMessages.appendChild(el);
-            aiMessages.scrollTop = aiMessages.scrollHeight;
-        }
-
-        // Create an assistant bubble that supports streaming text and a skip button.
-        function createAssistantBubble() {
-            const container = document.createElement('div');
-            container.style.alignSelf = 'flex-start';
-            container.style.background = 'rgba(0,0,0,0.45)';
-            container.style.color = '#dff';
-            container.style.fontSize = '13px';
-            container.style.padding = '8px';
-            container.style.borderRadius = '8px';
-            container.style.maxWidth = '100%';
-            container.style.position = 'relative';
-
-            const content = document.createElement('div');
-            content.className = 'ai-stream-content';
-            content.style.whiteSpace = 'pre-wrap';
-            content.style.lineHeight = '1.35';
-            container.appendChild(content);
-
-            const controls = document.createElement('div');
-            controls.style.position = 'absolute'; controls.style.right = '8px'; controls.style.top = '6px';
-            const skip = document.createElement('button');
-            skip.type = 'button'; skip.innerText = 'Skip';
-            skip.style.background = 'transparent'; skip.style.border = '1px solid rgba(255,255,255,0.06)'; skip.style.color = 'var(--sci-fi-cyan)';
-            skip.style.padding = '2px 6px'; skip.style.fontSize = '11px'; skip.style.borderRadius = '6px'; skip.style.cursor = 'pointer';
-            controls.appendChild(skip);
-            container.appendChild(controls);
-
-            aiMessages.appendChild(container);
-            aiMessages.scrollTop = aiMessages.scrollHeight;
-            return { container, content, skip };
-        }
-
-        // Simulate streaming/typing of a reply. Returns a promise that resolves when streaming finishes or is skipped.
-        function simulateStreamingReply(fullText, opts = {}) {
-            const { container, content, skip } = createAssistantBubble();
-            return new Promise((resolve) => {
-                let i = 0; let stopped = false;
-                // variable interval based on length (smaller for short replies)
-                const baseDelay = Math.max(10, Math.min(45, Math.floor(4000 / Math.max(1, fullText.length))));
-                const jitter = () => Math.floor((Math.random() * baseDelay) * 0.6);
-
-                const tick = () => {
-                    if (stopped) return;
-                    if (i >= fullText.length) {
-                        cleanup(); resolve(); return;
-                    }
-                    // append a small chunk to look natural
-                    const take = (Math.random() < 0.12) ? 3 : 1; // occasionally add a tiny burst
-                    content.textContent += fullText.slice(i, i + take);
-                    i += take;
-                    aiMessages.scrollTop = aiMessages.scrollHeight;
-                    scheduleNext();
-                };
-
-                let timer = null;
-                const scheduleNext = () => { timer = setTimeout(tick, baseDelay + jitter()); };
-
-                const cleanup = () => {
-                    stopped = true;
-                    if (timer) clearTimeout(timer);
-                    try { if (skip && skip.parentNode) skip.parentNode.removeChild(skip); } catch(e){}
-                    aiMessages.scrollTop = aiMessages.scrollHeight;
-                };
-
-                skip.addEventListener('click', () => {
-                    if (stopped) return;
-                    if (timer) clearTimeout(timer);
-                    content.textContent = fullText;
-                    cleanup();
-                    resolve();
-                });
-
-                // start
-                scheduleNext();
-            });
-        }
-
-        function setAiContextLabel(flightId) {
-            if (!aiContext) return;
-            if (flightId) aiContext.innerText = flightId; else { const sel = localStorage.getItem('selectedFlight'); aiContext.innerText = sel || 'None'; }
-        }
-
-        // show/hide chat depending on controlMode
-        function updateAiVisibility() {
-            try {
-                if (controlMode === 'gesture') { aiChat.style.display = 'none'; }
-                else { aiChat.style.display = 'flex'; setAiContextLabel(localStorage.getItem('selectedFlight')); }
-            } catch(e){}
-        }
-        // initial
-        updateAiVisibility();
-
-        // ensure visibility toggles when controlMode changes via setControlMode
-        const origSetControlMode = setControlMode;
-        setControlMode = function(mode) { origSetControlMode(mode); try { updateAiVisibility(); } catch(e){} };
-
-        async function sendAiMessage() {
-            const txt = (aiInput && aiInput.value || '').trim();
-            if (!txt) return;
-            renderMessage('user', txt);
-            aiInput.value = '';
-            // show typing indicator
-            const typing = document.createElement('div'); typing.innerText = 'Assistant is typing…'; typing.style.opacity = '0.7'; typing.style.fontSize = '13px'; typing.style.padding = '8px'; typing.style.borderRadius = '8px'; typing.style.background = 'rgba(0,0,0,0.28)'; aiMessages.appendChild(typing); aiMessages.scrollTop = aiMessages.scrollHeight;
-
-            const payload = { message: txt, flightId: localStorage.getItem('selectedFlight'), history: aiHistory };
-            try {
-                const r = await fetch('/api/ai-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const j = await r.json().catch(()=>null);
-                aiMessages.removeChild(typing);
-                if (!r.ok) {
-                    const detail = (j && (j.detail || j.error)) ? (j.detail || j.error) : `HTTP ${r.status}`;
-                    renderMessage('assistant', `Error: ${detail}`);
-                    return;
-                }
-                if (j && j.reply) {
+        // AI / Neuro-SAN Chat Integration ---
+        // Add a toggle button to switch between Azure AI and Neuro-SAN backends.
+        (function initChatIntegration(){
+            const chatRoot = document.getElementById('ai-chat');
+            if (!chatRoot) return;
+            // insert toggle bar
+            const header = chatRoot.firstElementChild;
+            if (header && !document.getElementById('chat-backend-toggle')) {
+                const toggleWrap = document.createElement('div');
+                toggleWrap.style.display = 'flex';
+                toggleWrap.style.alignItems = 'center';
+                toggleWrap.style.gap = '6px';
+                toggleWrap.style.fontSize = '10px';
+                toggleWrap.style.marginLeft = 'auto';
+                toggleWrap.style.paddingLeft = '12px';
+                const lbl = document.createElement('span'); lbl.textContent = 'Backend:'; lbl.style.opacity = '0.7';
+                const btn = document.createElement('button');
+                btn.id = 'chat-backend-toggle';
+                // restore persisted selection
+                const savedBackend = localStorage.getItem('chatBackend') || 'azure';
+                window.currentChatBackend = savedBackend; // expose globally for debugging
+                btn.textContent = savedBackend === 'azure' ? 'Azure' : 'Neuro-SAN';
+                btn.title = 'Click to switch between Azure OpenAI and Neuro-SAN backend';
+                btn.style.cursor = 'pointer';
+                btn.style.background = 'rgba(0,255,255,0.08)';
+                btn.style.color = '#9fe';
+                btn.style.border = '1px solid rgba(255,255,255,0.2)';
+                btn.style.borderRadius = '6px';
+                btn.style.padding = '4px 8px';
+                btn.style.fontSize = '10px';
+                btn.dataset.backend = savedBackend;
+                btn.addEventListener('click', ()=>{
+                    const cur = btn.dataset.backend === 'azure' ? 'neurosan' : 'azure';
+                    btn.dataset.backend = cur;
+                    btn.textContent = cur === 'azure' ? 'Azure' : 'Neuro-SAN';
+                    window.currentChatBackend = cur;
+                    localStorage.setItem('chatBackend', cur);
+                    appendSystemMessage(`Switched to ${btn.textContent} backend.`);
+                    console.log('[CHAT] backend switched ->', cur);
+                    // visual accent: change header color to distinguish
                     try {
-                        await simulateStreamingReply(j.reply);
-                    } catch(e) { /* ignore */ }
-                    aiHistory.push({ role: 'user', content: txt }); aiHistory.push({ role: 'assistant', content: j.reply });
-                } else {
-                    renderMessage('assistant', 'No reply from AI.');
-                }
-            } catch (err) {
-                try { aiMessages.removeChild(typing); } catch(e){}
-                renderMessage('assistant', `Failed to contact AI service: ${String(err)}`);
+                        header.style.background = cur === 'neurosan' ? 'rgba(0,120,255,0.18)' : 'rgba(255,255,255,0.03)';
+                    } catch(e){}
+                });
+                toggleWrap.appendChild(lbl); toggleWrap.appendChild(btn); header.appendChild(toggleWrap);
             }
-        }
+            // do not auto-open; use launcher
 
-        aiSend.addEventListener('click', (ev)=>{ ev.preventDefault(); sendAiMessage(); });
-        aiInput.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); sendAiMessage(); } });
+            const input = document.getElementById('ai-input');
+            const sendBtn = document.getElementById('ai-send');
+            const msgList = document.getElementById('ai-messages');
+            const contextLabel = document.getElementById('ai-chat-context');
 
-        // update context label when flight selection changes
-        (function(){ const dd = document.getElementById('flight-dropdown'); if (dd) { dd.addEventListener('change', ()=>{ setAiContextLabel(dd.value); }); } })();
+            window.setAiContextLabel = function(id){ if (contextLabel) contextLabel.textContent = id || 'None'; };
 
-        // 1Hz sampler that POSTs a compact payload to /api/gesture-log when test-mode active
-        let __samplerInterval = null;
-        function startSampler() {
-            if (__samplerInterval) return;
-            __samplerInterval = setInterval(async () => {
-                if (!__testMode) return;
+            function appendMessage(role, text){
+                if (!msgList) return; const wrapper = document.createElement('div');
+                wrapper.className = 'ai-msg ai-msg-' + role;
+                wrapper.style.maxWidth = '100%';
+                wrapper.style.fontSize = '12.5px';
+                wrapper.style.lineHeight = '1.5';
+                wrapper.style.position = 'relative';
+                wrapper.style.background = role === 'user' ? 'linear-gradient(135deg,rgba(0,140,200,0.28),rgba(0,80,140,0.25))' : 'linear-gradient(135deg,rgba(0,40,60,0.35),rgba(0,30,50,0.28))';
+                wrapper.style.border = '1px solid rgba(0,255,255,0.18)';
+                wrapper.style.padding = '10px 12px 10px 12px';
+                wrapper.style.borderRadius = role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
+                wrapper.style.alignSelf = role === 'user' ? 'flex-end' : 'flex-start';
+                wrapper.style.color = '#e6f9ff';
+                wrapper.style.boxShadow = '0 4px 14px -4px rgba(0,0,0,0.55)';
+                const originalText = text || '';
+                const md = renderMarkdown(originalText);
+                wrapper.innerHTML = md;
+                if (role === 'assistant') {
+                    // persist original (pre-render) markdown-ish reply for accurate copying
+                    wrapper.dataset.raw = originalText;
+                    const btn = document.createElement('button');
+                    btn.className = 'ai-copy-btn';
+                    btn.type='button';
+                    btn.innerHTML = '<span style="font-size:11px;">Copy</span>';
+                    btn.addEventListener('click', ()=>{
+                        copyAssistantContent(wrapper, btn);
+                    });
+                    wrapper.appendChild(btn);
+                }
+                msgList.appendChild(wrapper); msgList.scrollTop = msgList.scrollHeight;
+            }
+            function appendSystemMessage(text){ appendMessage('system', text); }
+
+            // Lightweight markdown + table parser for AI responses
+            // Enhanced markdown renderer with robust table support (exposed globally)
+            window.renderMarkdown = function renderMarkdown(md){
+                if (!md) return '';
+                md = String(md).replace(/\r\n?/g,'\n');
+                md = convertMarkdownTables(md);
+                // Headings
+                md = md.replace(/^### (.*)$/gm,'<h3>$1</h3>')
+                       .replace(/^## (.*)$/gm,'<h2>$1</h2>')
+                       .replace(/^# (.*)$/gm,'<h1>$1</h1>');
+                // Bold / italic / code
+                md = md.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+                       .replace(/\*(?!\s)(.+?)\*/g,'<em>$1</em>')
+                       .replace(/`([^`]+?)`/g,'<code>$1</code>');
+                // Bullet lists
+                md = md.replace(/^(?:-|\*) (.*(?:\n(?:-|\*) .*)*)/gm, block=>{
+                    return '<ul>' + block.split('\n').map(l=>l.replace(/^(?:-|\*) (.*)/,'<li>$1</li>')).join('') + '</ul>';
+                });
+                // Paragraph breaks
+                md = md.replace(/\n{2,}/g,'</p><p>');
+                md = '<p>'+md+'</p>';
+                md = md.replace(/<p>\s*<\/p>/g,'');
+                return md;
+            }
+            function escapeHtml(s){ return s.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+            function convertMarkdownTables(md){
+                const tableBlockRegex = /((?:^|\n)(?:[ \t]*\|.*\n){2,})/g;
+                return md.replace(tableBlockRegex, block => {
+                    const lines = block.trim().split('\n').filter(l=>l.trim().startsWith('|'));
+                    if (lines.length < 2) return block;
+                    const header = lines[0]; const separator = lines[1];
+                    if (!/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(separator)) return block;
+                    const headerCells = splitRow(header);
+                    const bodyLines = lines.slice(2);
+                    const rows = bodyLines.map(r=>splitRow(r));
+                    const thead = '<thead><tr>' + headerCells.map(c=>`<th>${escapeHtml(c)}</th>`).join('') + '</tr></thead>';
+                    const tbody = '<tbody>' + rows.map(r=>'<tr>'+ r.map(c=>`<td>${escapeHtml(c)}</td>`).join('') + '</tr>').join('') + '</tbody>';
+                    return '\n<div class="ai-table-wrapper"><table class="ai-table">' + thead + tbody + '</table></div>\n';
+                });
+            }
+            function splitRow(line){
+                return line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(c=>c.trim());
+            }
+
+            // Replace context label update to also set when flight changes
+            window.setAiContextLabel = function(id){ if (contextLabel) contextLabel.textContent = id || 'None'; };
+            // Initialize context from localStorage
+            try { const cur = localStorage.getItem('selectedFlight'); if (cur) window.setAiContextLabel(cur); } catch(e){}
+            // Observe localStorage changes (other tabs) and internal selection updates (monkey patch setItem)
+            (function(){
+                const origSet = localStorage.setItem;
+                localStorage.setItem = function(k,v){ origSet.apply(this,arguments); if (k==='selectedFlight') { window.setAiContextLabel(v); }};
+                window.addEventListener('storage', ev=>{ if (ev.key==='selectedFlight') window.setAiContextLabel(ev.newValue); });
+            })();
+
+            // Local helper to display (or later stream) assistant reply
+            async function simulateStreamingReply(fullText){
+                if (!msgList) return;
+                const container = document.createElement('div');
+                container.className='ai-msg ai-msg-assistant';
+                container.style.background='linear-gradient(135deg,rgba(0,40,60,0.35),rgba(0,30,50,0.28))';
+                container.style.border='1px solid rgba(0,255,255,0.18)';
+                container.style.padding='10px 12px';
+                container.style.borderRadius='14px 14px 14px 4px';
+                container.style.fontSize='12.5px';
+                container.style.lineHeight='1.5';
+                container.style.color='#e6f9ff';
+                container.style.boxShadow='0 4px 14px -4px rgba(0,0,0,0.55)';
+                const inner = document.createElement('div');
+                inner.innerHTML='';
+                container.appendChild(inner); msgList.appendChild(container); msgList.scrollTop = msgList.scrollHeight;
+                const text = fullText || '';
+                // token simulation
+                const tokens = text.split(/(\s+)/); let i=0;
+                while (i < tokens.length){
+                    inner.innerHTML = renderMarkdown(tokens.slice(0,i+1).join(''));
+                    msgList.scrollTop = msgList.scrollHeight;
+                    await new Promise(r=>setTimeout(r, tokens[i].trim()? 22: 8));
+                    i++;
+                }
+                container.dataset.raw = text; // store full original reply
+                // Add copy button after streaming completes
+                const btn = document.createElement('button');
+                btn.className='ai-copy-btn';
+                btn.type='button';
+                btn.innerHTML='<span style="font-size:11px;">Copy</span>';
+                btn.addEventListener('click', ()=>{ copyAssistantContent(container, btn); });
+                container.appendChild(btn);
+            }
+
+            function copyAssistantContent(wrapper, btn){
                 try {
-                    // collect best-effort snapshot
-                    const snap = { gx: cursorSmooth.x, gy: cursorSmooth.y, smoothX: _smooth.x, smoothY: _smooth.y, lastTargetX: (gestureCursor && gestureCursor.dataset && gestureCursor.dataset._lastTargetX) ? Number(gestureCursor.dataset._lastTargetX) : null, lastTargetY: (gestureCursor && gestureCursor.dataset && gestureCursor.dataset._lastTargetY) ? Number(gestureCursor.dataset._lastTargetY) : null };
-                    await fetch('/api/gesture-log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snap) });
-                } catch(e) { console.warn('sampler post failed', e); }
-            }, 1000);
-        }
-        function stopSampler() { if (__samplerInterval) { clearInterval(__samplerInterval); __samplerInterval = null; } }
+                    let raw = wrapper.dataset.raw;
+                    if (!raw) {
+                        // fallback: derive markdown-like text from DOM
+                        const clone = wrapper.cloneNode(true);
+                        clone.querySelectorAll('.ai-copy-btn').forEach(b=>b.remove());
+                        clone.querySelectorAll('table').forEach(tbl=>{
+                            let textRows=[]; tbl.querySelectorAll('tr').forEach((tr,idx)=>{
+                                const cells=[...tr.children].map(td=>td.textContent.trim());
+                                const row='| '+cells.join(' | ')+' |';
+                                textRows.push(row);
+                                if (idx===0) textRows.push('| '+cells.map(()=> '---').join(' | ')+' |');
+                            });
+                            const pre=document.createElement('pre'); pre.textContent=textRows.join('\n'); tbl.replaceWith(pre);
+                        });
+                        raw = clone.innerText.trim();
+                    }
+                    navigator.clipboard.writeText(raw.trim()).then(()=>{
+                        btn.classList.add('copied'); btn.textContent='Copied';
+                        setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML='<span style="font-size:11px;">Copy</span>'; }, 2200);
+                    });
+                } catch(e){ console.warn('Copy failed', e); }
+            }
 
-        // auto-start sampler when user enables test mode via UI or keyboard
-        const originalToggleHandler = window.addEventListener;
-        // ensure sampler starts
-        setInterval(()=>{ if (__testMode) startSampler(); else stopSampler(); }, 800);
+            let __aiSending = false;
+            async function sendCurrent(){
+                if (__aiSending) return; // guard
+                __aiSending = true;
+                const val = (input.value || '').trim(); if (!val) return;
+                appendMessage('user', val); input.value='';
 
-        const tutorialSteps = [
-            { title: 'Mode & Controls', text: 'Press G to toggle Gesture mode. Use the mouse to orbit or enable gestures to interact hands-free. The mode badge shows current control.', el: '#mode-badge' },
-            { title: 'Calibration', text: 'Press C to start calibration. Hold your index finger in the reticle and pinch to click. Calibration maps your hand to screen coordinates.', el: '#cal-progress' },
-            { title: 'Inspect Components', text: 'Hover or pinch near glowing markers to reveal labels and telemetry. Click a label to focus the camera on that component.', el: null },
-            { title: 'Debug & Options', text: 'Press D to toggle debug axes. Use the Help panel for shortcuts and live telemetry.', el: '#help-panel' },
-            { title: 'Ready', text: 'You are ready — try pressing G and C to experiment. You can reopen this tour anytime from the Help panel.', el: '#mode-badge' }
-        ];
+                // Typing indicator (animated pulses)
+                const typing = document.createElement('div');
+                typing.className = 'ai-typing';
+                typing.setAttribute('aria-label','Assistant typing');
+                typing.innerHTML = '<span style="font-weight:600;">Assistant</span><div class="pulses"><span class="pulse"></span><span class="pulse"></span><span class="pulse"></span></div>';
+                typing.style.alignSelf='flex-start';
+                msgList.appendChild(typing); msgList.scrollTop = msgList.scrollHeight;
 
-        let tutorialIndex = 0;
+                const backend = window.currentChatBackend || 'azure';
+                const endpoint = backend === 'neurosan' ? '/api/neurosan-chat' : '/api/ai-chat';
 
-        function showTutorial(at = 0) {
-            if (localStorage.getItem(TUTORIAL_KEY)) return; // already seen
-            tutorialIndex = at;
-            updateTutorial();
-            tutorialOverlay.style.display = 'flex';
-            tutorialPointer.style.display = 'block';
-            gsap.fromTo('#tutorial-card', { y: -20, autoAlpha: 0 }, { y:0, autoAlpha:1, duration:0.5 });
-        }
+                // Update payload for squadron-level questions
+                const isSquadronQuestion = /squadron|all flights|fleet/i.test(val);
+                const payload = {
+                    message: val,
+                    flightId: isSquadronQuestion ? null : localStorage.getItem('selectedFlight'),
+                    history: aiHistory
+                };
 
-        function hideTutorial(markSeen = true) {
-            tutorialOverlay.style.display = 'none';
-            tutorialPointer.style.display = 'none';
-            gsap.to('#tutorial-card', { y:-10, autoAlpha:0, duration:0.35 });
-            if (markSeen) localStorage.setItem(TUTORIAL_KEY, '1');
-        }
+                console.log(`[CHAT] Sending to ${endpoint} with payload:`, payload);
 
-        function updateTutorial() {
-            const s = tutorialSteps[tutorialIndex];
-            document.querySelector('#tutorial-card h2').textContent = s.title;
-            tutorialText.textContent = s.text;
-            // position pointer near element if present
-            if (s.el) {
-                const target = document.querySelector(s.el);
-                if (target) {
-                    const r = target.getBoundingClientRect();
-                    const x = r.left + r.width/2;
-                    const y = r.top + r.height/2;
-                    gsap.to(tutorialPointer, { x, y, duration: 0.6, ease: 'power2.out' });
-                    highlightElement(target);
+                try {
+                    const r = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const j = await r.json().catch(() => null);
+                    try { typing.remove(); } catch(e){}
+                    if (!r.ok) {
+                        const detail = (j && (j.detail || j.error)) ? (j.detail || j.error) : `HTTP ${r.status}`;
+                        appendMessage('assistant', `Error: ${detail}`);
+                        return;
+                    }
+                    if (j && j.reply) {
+                        await simulateStreamingReply(j.reply);
+                        aiHistory.push({ role: 'user', content: val });
+                        aiHistory.push({ role: 'assistant', content: j.reply });
+                    } else {
+                        appendMessage('assistant', 'No reply from AI.');
+                    }
+                } catch (err) {
+                    try { typing.remove(); } catch (e) {}
+                    appendMessage('assistant', `Failed to contact AI service: ${String(err)}`);
                 }
-            } else {
-                // center pointer over canvas reticle
-                const rect = renderer.domElement.getBoundingClientRect();
-                gsap.to(tutorialPointer, { x: rect.left + rect.width/2, y: rect.top + rect.height/2, duration:0.6 });
-                removeHighlights();
+                __aiSending = false;
             }
-            // update buttons
-            tutorialPrev.disabled = tutorialIndex === 0;
-            tutorialNext.textContent = (tutorialIndex === tutorialSteps.length -1) ? 'Finish' : 'Next';
-        }
-
-        function nextTutorial() {
-            if (tutorialIndex < tutorialSteps.length -1) {
-                tutorialIndex++;
-                updateTutorial();
-            } else {
-                hideTutorial(true);
-            }
-        }
-        function prevTutorial() { if (tutorialIndex>0) { tutorialIndex--; updateTutorial(); } }
-        function skipTutorial() { hideTutorial(true); }
-
-        // simple highlight via outline/glow
-        const _highlighted = new Set();
-        function highlightElement(el) {
-            removeHighlights();
-            el.classList.add('tutorial-highlight');
-            _highlighted.add(el);
-            // animate pulse
-            gsap.fromTo(el, { scale: 1 }, { scale:1.04, yoyo:true, repeat:3, duration:0.4 });
-        }
-        function removeHighlights() { _highlighted.forEach(e=> e.classList.remove('tutorial-highlight')); _highlighted.clear(); }
-
-        // add small CSS rule for highlight
-        const style = document.createElement('style');
-        style.textContent = '.tutorial-highlight{ box-shadow:0 8px 30px rgba(0,255,255,0.14); transform-origin:center center; }';
-        document.head.appendChild(style);
-
-        // Help panel collapse/expand wiring
-        (function(){
-            const hp = document.getElementById('help-panel');
-            const btn = document.getElementById('help-toggle-btn');
-            const header = hp.querySelector('.help-header');
-            const body = document.getElementById('help-body');
-            // measure content height for smooth animation
-            function measure() { body.style.height = 'auto'; const h = body.getBoundingClientRect().height; body.style.height = h + 'px'; return h; }
-            function collapse(animated = true) {
-                hp.classList.remove('expanded'); hp.classList.add('collapsed'); hp.setAttribute('aria-expanded','false');
-                if (window.gsap) { gsap.to(body, { height: 0, duration: animated ? 0.32 : 0, ease: 'power2.inOut' }); gsap.to(hp.querySelector('svg'), { rotate: 0, duration: 0.32, ease: 'power2.inOut' }); }
-                else { body.style.height = '0px'; hp.querySelector('svg').style.transform = 'rotate(0deg)'; }
-            }
-            function expand(animated = true) {
-                const h = measure(); hp.classList.remove('collapsed'); hp.classList.add('expanded'); hp.setAttribute('aria-expanded','true');
-                if (window.gsap) { gsap.to(body, { height: h, duration: animated ? 0.36 : 0, ease: 'power2.out', onComplete: ()=>{ body.style.height = 'auto'; } }); gsap.to(hp.querySelector('svg'), { rotate: 180, duration: 0.36, ease: 'power2.out' }); }
-                else { body.style.height = h + 'px'; hp.querySelector('svg').style.transform = 'rotate(180deg)'; }
-            }
-            // initialize collapsed by default (but allow user preference via localStorage)
-            try {
-                const pref = localStorage.getItem('helpPanelCollapsed');
-                if (pref === 'false') { expand(false); } else { collapse(false); }
-            } catch(e) { collapse(false); }
-            function toggle() { if (hp.classList.contains('collapsed')) { expand(); localStorage.setItem('helpPanelCollapsed','false'); } else { collapse(); localStorage.setItem('helpPanelCollapsed','true'); } }
-
-            header.addEventListener('click', (ev)=>{ ev.stopPropagation(); toggle(); });
-            header.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } });
-            if (btn) btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); toggle(); });
+            sendBtn.addEventListener('click', sendCurrent);
+            input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') { e.preventDefault(); sendCurrent(); }});
+            // suggestion buttons
+            document.querySelectorAll('.ai-suggest').forEach(btn=>{
+                btn.addEventListener('click', ()=>{ input.value = btn.dataset.q; sendCurrent(); });
+            });
+            // backend label sync
+            const backendLbl = document.getElementById('ai-backend-label');
+            if (backendLbl) backendLbl.textContent = (window.currentChatBackend==='neurosan'?'Neuro-SAN':'Azure');
+            const toggleBtn = document.getElementById('chat-backend-toggle');
+            if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ if (backendLbl) backendLbl.textContent = (window.currentChatBackend==='neurosan'?'Neuro-SAN':'Azure'); });
+            // close button
+            // Launcher + toggle logic
+            const launcher = document.getElementById('ai-chat-launcher');
+            function openChat(){
+                if (!chatRoot) return; chatRoot.classList.remove('ai-chat-hide'); chatRoot.classList.add('ai-chat-show'); chatRoot.style.display='flex'; if (launcher) launcher.style.display='none'; }
+            function hideChat(){ if (!chatRoot) return; chatRoot.classList.remove('ai-chat-show'); chatRoot.classList.add('ai-chat-hide'); setTimeout(()=>{ if (chatRoot.classList.contains('ai-chat-hide')) { chatRoot.style.display='none'; if (launcher) launcher.style.display='flex'; } }, 360);}            
+            if (launcher) launcher.addEventListener('click', openChat);
+            // Header double-click to collapse
+            const chatHdr = document.getElementById('ai-chat-header');
+            if (chatHdr) chatHdr.addEventListener('dblclick', hideChat);
+            // Optional: ESC to collapse
+            window.addEventListener('keydown', (e)=>{ if (e.key==='Escape') hideChat(); });
         })();
 
-        // wire buttons
-        tutorialNext.addEventListener('click', nextTutorial);
-        tutorialPrev.addEventListener('click', prevTutorial);
-        tutorialSkip.addEventListener('click', skipTutorial);
-
-        // keyboard support: Right/Left/Escape
-        window.addEventListener('keydown', (e)=>{
-            if (tutorialOverlay.style.display !== 'flex') return;
-            // avoid navigating tutorial while typing in an input
-            try { const active = document.activeElement; if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable) && e.key !== 'Escape') return; } catch(_) {}
-            if (e.key === 'ArrowRight') nextTutorial();
-            if (e.key === 'ArrowLeft') prevTutorial();
-            if (e.key === 'Escape') skipTutorial();
-        });
-
-        // attempt to auto-start tutorial on first load after scene is ready
-        window.addEventListener('load', ()=>{
-            setTimeout(()=>{
-                if (!localStorage.getItem(TUTORIAL_KEY)) showTutorial(0);
-            }, 700);
-        });
-
-        // reopen tour link
-        const reopen = document.getElementById('reopen-tour');
-        if (reopen) {
-            reopen.addEventListener('click', (ev)=>{ ev.preventDefault(); localStorage.removeItem(TUTORIAL_KEY); showTutorial(0); });
-        }
-
-        // pointer pulse animation while visible
-        gsap.to('#tutorial-pointer', { scale: 0.9, repeat: -1, yoyo: true, duration: 0.85, ease: 'sine.inOut' });
-
-        // follow mouse when tutorial overlay is active (for steps without specific element)
-        window.addEventListener('mousemove', (ev)=>{
-            if (tutorialOverlay.style.display !== 'flex') return;
-            const s = tutorialSteps[tutorialIndex];
-            if (!s.el) {
-                gsap.to(tutorialPointer, { x: ev.clientX, y: ev.clientY, duration: 0.18, ease: 'power2.out' });
-            }
-        });
-
-        const listNodesLink = document.getElementById('list-nodes');
-        if (listNodesLink) {
-            listNodesLink.addEventListener('click', (ev)=>{
-                ev.preventDefault();
-                if (!aircraftModel) { console.warn('Model not loaded yet'); return; }
-                const names = [];
-                aircraftModel.traverse((n) => { if (n.name) names.push(n.name); });
-                console.log('Model node names:', names);
-                alert('Model node names logged to console (' + names.length + ' entries)');
+        // Restore shortcut panel toggle functionality
+        const helpPanel = document.getElementById('help-panel');
+        const helpToggleBtn = document.getElementById('help-toggle-btn');
+        if (helpPanel && helpToggleBtn) {
+            helpToggleBtn.addEventListener('click', () => {
+                const isExpanded = helpPanel.getAttribute('aria-expanded') === 'true';
+                helpPanel.setAttribute('aria-expanded', !isExpanded);
+                helpPanel.classList.toggle('collapsed', isExpanded);
             });
         }
+
+        
     </script>
 </body>
 </html>
