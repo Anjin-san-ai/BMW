@@ -1,7 +1,6 @@
 node_modules/
-data/*.json
 .env
-.data/logs
+data/
 .DS_Store
 dist
 build
