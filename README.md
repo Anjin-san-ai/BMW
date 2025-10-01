@@ -1,170 +1,323 @@
-# BMW Fleet Monitor (BMW X5M Interactive Vehicle Management)
+# BMW X5M Fleet Monitor 🚗
 
-=====================================
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r150-orange.svg)](https://threejs.org/)
 
-Short description
+**Interactive 3D Vehicle Fleet Management System with Professional Studio Lighting**
 
------------------
+A sophisticated web-based fleet monitoring application featuring real-time 3D visualization of BMW X5M vehicles with professional-grade lighting, interactive component inspection, and AI-powered health diagnostics.
 
-This repository contains a single-page interactive 3D viewer for BMW X5M vehicles with gesture control, AI chat integration (proxied via a Node/Express server), vehicle/health data stored under `data/`, and simple file-based logging under `data/logs/`.
+![BMW X5M Fleet Monitor](dashboard.png)
 
-Quick start
+## ✨ Features
 
------------
+### 🎨 **Professional 3-Point Lighting**
+- **Key Light** (3.5 intensity) - Studio-grade primary illumination
+- **Fill Lights** (1.75 intensity) - Dimensional depth with 50% key-to-fill ratio
+- **Rim/Back Light** (2.8 intensity) - Edge separation and silhouette definition
+- **D65 6500K** neutral white color temperature for accurate color reproduction
 
-1.  Install dependencies
+### 🚗 **3D Vehicle Visualization**
+- High-quality BMW X5M 3D model with PBR materials
+- Interactive component markers with real-time health status
+- Auto-fit camera positioning for optimal framing
+- Smooth animations with GSAP
+- OrbitControls for intuitive navigation
 
-    ```bash
-    npm install
-    ```
+### 📊 **Fleet Management**
+- Real-time vehicle health monitoring
+- Component-level diagnostics with fault codes
+- Maintenance scheduling and priority tracking
+- Multi-vehicle fleet overview
+- Status indicators (Good, Warning, Critical)
 
-2.  Add environment variables
+### 🤖 **AI Integration**
+- Azure OpenAI-powered chat assistant
+- Intelligent fleet analysis and recommendations
+- Natural language query support
+- Maintenance prediction and insights
 
-    Create a `.env` file in the project root or set environment variables in your shell. Minimal variables used by the server:
+### 🎯 **Interactive Features**
+- Hover effects on component markers
+- Click to inspect detailed component information
+- Visual feedback with pulsing animations
+- Keyboard shortcuts for quick navigation
+- Component health color coding
 
-    - AZURE\_OPENAI\_ENDPOINT - (optional) Azure OpenAI endpoint, e.g. https://your-resource.openai.azure.com
-    - AZURE\_OPENAI\_KEY - (optional) Azure OpenAI key
-    - AZURE\_OPENAI\_DEPLOYMENT - (optional) Azure OpenAI deployment name used to call Chat Completions
-    - PORT - (optional) port for the Node server (defaults to 3000)
+## 🚀 Quick Start
 
-    Example `.env` (do not commit secrets):
+### Prerequisites
 
-    ```bash
-    AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-    AZURE_OPENAI_KEY=your_api_key_here
-    AZURE_OPENAI_DEPLOYMENT=deployment-name
-    PORT=3000
-    ```
+- Node.js 18.x or higher
+- npm or yarn package manager
+- Modern web browser with WebGL support
 
-3.  Run the server
+### Installation
 
-    ```bash
-    npm start         # production mode
-    npm run dev       # nodemon watch during development
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Anjin-san-ai/BMW.git
+   cd BMW
+   ```
 
-    Open http://localhost:3000 in your browser.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Project layout
+3. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and add your API keys:
+   ```env
+   # Azure OpenAI Configuration
+   AZURE_OPENAI_ENDPOINT=your-endpoint-here
+   AZURE_OPENAI_KEY=your-key-here
+   AZURE_OPENAI_DEPLOYMENT=your-deployment-name
 
---------------
+   # Optional: NeuroSAN Integration
+   NEURO_SAN_API_URL=your-neurosan-url
+   NEURO_SAN_PROJECT_NAME=your-project
+   ```
 
-- `public/` - client SPA and static assets (three.js scene, textures, GLTF scene)
-- `server.js` - Express server entrypoint
-- `server/` - server helpers and route modules
-  - `server/config.js` - central configuration
-  - `server/prompts.json` - system/user prompts used by AI route
-  - `server/routes/ai.js` - AI proxy and deterministic summary handler
-  - `server/routes/neurosan_client.js` - (project specific route)
-- `data/` - authoritative application data
-  - `flights.json` - master flights list (20 flights)
-  - `flights/*.json` - per-flight saved files
-  - `logs/` - JSON-lines logs produced by server (e.g., `ai.log`, `gesture.log`)
-- `test/` - unit & integration tests (Mocha)
+4. **Start the development server:**
+   ```bash
+   npm start
+   ```
 
-Features and behavior
+5. **Open in browser:**
+   ```
+   http://localhost:3000
+   ```
 
----------------------
+## 🎮 Controls & Shortcuts
 
-- 3D Viewer: uses three.js, OrbitControls and a GLTF scene. Aircraft model scale has been increased for better visibility.
-- Gesture control: MediaPipe-based gestures to hover/select and manipulate the model.
-- Camera controls: an on-screen slider controls zoom/distance (slider is authoritative when `SLIDER_ONLY_CAMERA` is enabled); mouse and gestures can still rotate the model on the X-axis.
-- Flight data: component marker information and flight health are read from `data/flights.json` and per-flight files.
-- AI chat: UI widget in the client posts to `/api/ai-chat`. The server runs a tiny deterministic classifier and will short-circuit to a local deterministic reply for squadron/flight summary queries (no call to Azure) when confidence is high. Otherwise it augments the system prompt with a local summary and proxies the request to Azure OpenAI.
-- Logs: AI events are appended as JSON-lines to `data/logs/ai.log`; gesture sampling (Test Mode) posts to `/api/gesture-log` and is stored in `data/logs/gesture.log`.
+| Key | Action |
+|-----|--------|
+| `Mouse Drag` | Rotate camera around vehicle |
+| `Mouse Wheel` | Zoom in/out |
+| `Right Click + Drag` | Pan camera |
+| `Click Marker` | Inspect component details |
+| `F` | Toggle vehicle selector |
+| `R` | Reset camera to default view |
+| `D` | Toggle debug anchor visualization |
+| `Esc` | Close active panels |
+| `?` | Show help panel |
 
-Available API endpoints
+## 📁 Project Structure
 
------------------------
-
-All endpoints are served by the Node server (default port 3000).
-
-- GET /api/flights
-    - Returns the flights index (`data/flights.json`).
-
-- GET /api/flights/:id
-    - Returns a single flight details (from `data/flights/<id>.json` or looked up in master file).
-
-- PUT /api/flights/:id
-    - Persists per-flight data updates (accepts JSON payload and writes to `data/flights/<id>.json`).
-
-- GET /api/squadron-summary
-    - Returns a deterministic server-side computed squadron summary (aggregates totals and worst-case component statuses across flights).
-
-- POST /api/gesture-log
-    - Accepts 1Hz sampled gesture telemetry when Test Mode is enabled in the client; server appends to `data/logs/gesture.log`.
-
-- POST /api/ai-chat
-    - AI chat endpoint. Server runs an intent classifier and either replies locally (for high-confidence summary intents) or forwards to Azure OpenAI with injected local summaries. Events are logged to `data/logs/ai.log`.
-
-Development notes and architecture
-
-----------------------------------
-
-- Deterministic fallback: to improve reliability and avoid unnecessary LLM calls, the server includes a small classifier and deterministic summary generators (`computeSquadron` / `computeFlightSummary`). When the classifier returns a summary intent with confidence >= 0.7 the server will reply locally.
-- Prompts: `server/prompts.json` contains the system prompts used by the AI route. Modify prompts there; do not commit secrets.
-- Config: central config is wired through `server/config.js` which reads from environment variables.
-
-Testing
-
--------
-
-Run unit tests with Mocha:
-
-```bash
-npm test
+```
+BMW/
+├── public/                 # Static assets
+│   ├── index.html         # Main application
+│   ├── app.css            # Styles
+│   ├── scene.gltf         # BMW X5M 3D model
+│   ├── scene.bin          # Model binary data
+│   └── textures/          # PBR texture maps
+│       ├── car_bmw_x5m_2014_*.png
+│       ├── grille_*.png
+│       └── lights_*.png
+├── server/                 # Backend
+│   ├── routes/
+│   │   ├── ai.js          # AI chat endpoints
+│   │   └── neurosan_client.js
+│   ├── config.js          # Server configuration
+│   └── prompts.json       # AI system prompts
+├── data/                   # Data storage
+│   ├── cars/              # Vehicle data files
+│   │   ├── BMW-X5M-001.json
+│   │   └── BMW-X5M-002.json
+│   ├── cars.json          # Fleet registry
+│   └── car_health.json    # Health status cache
+├── server.js               # Express server
+├── package.json
+└── README.md
 ```
 
-Troubleshooting
+## 🛠️ Technical Stack
 
----------------
+- **Frontend:**
+  - Three.js r150 (3D rendering)
+  - GSAP 3.x (animations)
+  - Vanilla JavaScript (no framework overhead)
 
-- Missing dependencies when running `npm start`:
-    - Run `npm install` and try again.
+- **Backend:**
+  - Node.js & Express
+  - Azure OpenAI API
+  - Body-parser for JSON handling
 
-- Azure OpenAI errors like "The API deployment for this resource does not exist":
-    - Verify `AZURE_OPENAI_DEPLOYMENT` matches the deployed model name in the Azure portal. Confirm `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_KEY` are correct.
-    - Check server console output for proxied error details (server forwards Azure error responses into `ai.log`).
+- **3D Assets:**
+  - GLTF/GLB format
+  - PBR materials (Metallic-Roughness workflow)
+  - 2K texture resolution
 
-- Git push rejected (non-fast-forward):
-    - This happens when the remote contains commits you don't have locally. Safe sequence:
+## 🎨 Lighting Configuration
 
-    ```bash
-    # 1) Save local changes if you have uncommitted work
-    git add -A
-    git commit -m "WIP: save local work"   # or 'git stash'
+### Professional Studio Setup
 
-    # 2) Integrate remote changes (rebase keeps a linear history)
-    git fetch origin
-    git pull --rebase origin main
+```javascript
+// Key Light (Primary)
+Intensity: 3.5
+Position: (3500, 8000, 4200)
+Shadow Quality: 2048x2048
 
-    # 3) Resolve any conflicts, then continue rebase
-    # git rebase --continue
+// Fill Lights (Ambient + Hemisphere)
+Intensity: 1.75 each (~50% of key)
+Color: D65 6500K neutral white
 
-    # 4) Push
-    git push -u origin main
-    ```
+// Rim Light (Separation)
+Intensity: 2.8
+Position: (-6000, 3000, -8000)
 
-    I can also perform the safe stash/pull/rebase/push sequence for you if you want — tell me whether to auto-commit the current changes or stash them.
+// Background Gradient
+Top: #303741 (neutral grey-blue)
+Bottom: #14191E (subtle dark)
+```
 
-Security and secrets
+### Color Management
+- **Workflow:** Linear RGB during rendering
+- **Output:** sRGB for web display
+- **Tone Mapping:** ACES Filmic for natural look
+- **Exposure:** 1.2 (balanced)
 
---------------------
+## 📊 API Endpoints
 
-- Never commit `.env` or other secrets. Add them to `.gitignore`.
-- Before pushing to a remote, double-check you are not committing API keys or private data.
+### Vehicle Management
+- `GET /api/cars` - List all vehicles
+- `GET /api/cars/:id` - Get vehicle details
+- `GET /api/fleet-summary` - Fleet overview
 
-Contributing
+### AI Integration
+- `POST /api/ai-chat` - Azure OpenAI chat
+- `POST /api/neurosan-chat` - NeuroSAN analysis
+- `GET /api/ai-summary-cache` - Cached summaries
 
-------------
+### Configuration
+- `GET /api/app-config` - Application settings
+- `GET /api/tuner` - Tuning parameters
 
-- Open issues for bugs and feature requests.
-- Make feature branches from `main` and open pull requests with a clear description and tests where applicable.
+## 🔧 Configuration
 
-License
+### Server Configuration (`server/config.js`)
 
--------
+```javascript
+module.exports = {
+  port: process.env.PORT || 3000,
+  dataDir: path.join(__dirname, '..', 'data'),
+  azure: {
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+    key: process.env.AZURE_OPENAI_KEY,
+    deployment: process.env.AZURE_OPENAI_DEPLOYMENT
+  }
+};
+```
 
-MIT
+### 3D Scene Settings (`public/index.html`)
 
-Contact / support
+```javascript
+// Model scale
+const DEFAULT_VEHICLE_SCALE = 50.0;
+
+// Camera settings
+camera.fov = 50;
+camera.near = 1;
+camera.far = 100000;
+
+// Lighting intensities
+keyLight.intensity = 3.5;
+ambient.intensity = 1.75;
+rimLight.intensity = 2.8;
+```
+
+## 📖 Documentation
+
+- **[Bug Fixes Summary](BUG_FIXES_SUMMARY.md)** - Detailed list of resolved issues
+- **[Gesture Removal Status](GESTURE_REMOVAL_STATUS.md)** - Cleanup documentation
+- **[Professional Lighting](PROFESSIONAL_LIGHTING_APPLIED.md)** - Lighting setup guide
+
+## 🎯 Component Health Status
+
+| Status | Color | Priority | Action |
+|--------|-------|----------|--------|
+| **Good** | 🟢 Green | Low | Regular maintenance |
+| **Warning** | 🟡 Yellow | Medium | Schedule inspection |
+| **Critical** | 🔴 Red | High | Immediate attention |
+
+## 🚀 Deployment
+
+### Production Build
+
+```bash
+# Set environment to production
+export NODE_ENV=production
+
+# Start the server
+npm start
+```
+
+### Docker Deployment
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+Build and run:
+```bash
+docker build -t bmw-fleet-monitor .
+docker run -p 3000:3000 --env-file .env bmw-fleet-monitor
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Three.js** - 3D rendering engine
+- **GSAP** - Animation library
+- **Azure OpenAI** - AI integration
+- **BMW** - 3D model inspiration
+
+## 📧 Contact
+
+**Imran Khan AN**
+- GitHub: [@Anjin-san-ai](https://github.com/Anjin-san-ai)
+- Repository: [BMW Fleet Monitor](https://github.com/Anjin-san-ai/BMW)
+
+## 🔮 Future Enhancements
+
+- [ ] Multi-vehicle comparison view
+- [ ] Real-time telemetry integration
+- [ ] Mobile responsive design
+- [ ] VR/AR support
+- [ ] Advanced analytics dashboard
+- [ ] Fleet simulation mode
+- [ ] Export diagnostics reports
+- [ ] Multi-language support
+
+---
+
+**Built with ❤️ for automotive fleet management**
+
+[![Made with Three.js](https://img.shields.io/badge/Made%20with-Three.js-black.svg?style=flat-square&logo=three.js)](https://threejs.org/)
+[![Powered by Node.js](https://img.shields.io/badge/Powered%20by-Node.js-green.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![Azure OpenAI](https://img.shields.io/badge/AI-Azure%20OpenAI-0078D4.svg?style=flat-square&logo=microsoft-azure)](https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/)
