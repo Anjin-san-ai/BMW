@@ -1,0 +1,88 @@
+{
+  "id": "BMW-X5M-002",
+  "displayName": "BMW X5M - Vehicle 002",
+  "year": 2016,
+  "model": "X5M",
+  "vin": "WBSFR9C50GC123457",
+  "mileage": 52000,
+  "components": [
+    {
+      "id": "engine",
+      "attachTo": "chassis",
+      "displayName": "V8 Twin-Turbo Engine",
+      "status": "Warning",
+      "componentName": "S63 4.4L V8 Engine",
+      "maintenanceDue": "1000 miles",
+      "priorityLevel": "MEDIUM",
+      "descriptionText": "Engine oil change due soon, turbo boost pressure slightly low.",
+      "markerOffset": [0, 0.5, 1.2],
+      "cameraOffset": [0, 1, 3],
+      "faultCode": "BMW007"
+    },
+    {
+      "id": "transmission",
+      "attachTo": "chassis",
+      "displayName": "8-Speed Automatic",
+      "status": "Good",
+      "componentName": "ZF 8HP70 Transmission",
+      "maintenanceDue": "8000 miles",
+      "priorityLevel": "LOW",
+      "descriptionText": "Transmission fluid recently changed, shifting smoothly.",
+      "markerOffset": [0, 0.3, 0.8],
+      "cameraOffset": [0, 0.8, 2.5],
+      "faultCode": "BMW008"
+    },
+    {
+      "id": "brakes",
+      "attachTo": "car_bmw_x5m_2014_Meshcaliper",
+      "displayName": "M Performance Brakes",
+      "status": "Good",
+      "componentName": "Brembo Brake System",
+      "maintenanceDue": "12000 miles",
+      "priorityLevel": "LOW",
+      "descriptionText": "Brake system in excellent condition.",
+      "markerOffset": [0, 0.2, 0.5],
+      "cameraOffset": [0, 0.5, 1.5],
+      "faultCode": "BMW009"
+    },
+    {
+      "id": "suspension",
+      "attachTo": "chassis",
+      "displayName": "Adaptive M Suspension",
+      "status": "Warning",
+      "componentName": "Electronic Damping Control",
+      "maintenanceDue": "5000 miles",
+      "priorityLevel": "MEDIUM",
+      "descriptionText": "Rear shock absorbers showing signs of wear.",
+      "markerOffset": [0, 0.1, 0.3],
+      "cameraOffset": [0, 0.3, 1],
+      "faultCode": "BMW010"
+    },
+    {
+      "id": "electronics",
+      "attachTo": "chassis",
+      "displayName": "iDrive System",
+      "status": "Good",
+      "componentName": "BMW iDrive 4.0",
+      "maintenanceDue": "Regular Updates",
+      "priorityLevel": "LOW",
+      "descriptionText": "All systems functioning normally.",
+      "markerOffset": [0, 0.8, 0.2],
+      "cameraOffset": [0, 1.2, 0.8],
+      "faultCode": "BMW011"
+    },
+    {
+      "id": "tires",
+      "attachTo": "tire",
+      "displayName": "Performance Tires",
+      "status": "Good",
+      "componentName": "Michelin Pilot Sport 4S",
+      "maintenanceDue": "15000 miles",
+      "priorityLevel": "LOW",
+      "descriptionText": "Tire tread depth within acceptable range.",
+      "markerOffset": [0, 0.1, 0.4],
+      "cameraOffset": [0, 0.4, 1.2],
+      "faultCode": "BMW012"
+    }
+  ]
+}

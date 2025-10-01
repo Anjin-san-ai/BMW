@@ -615,3 +615,20 @@
 {"ts":"2025-09-03T15:01:38.039Z","backend":"azure","event":"classification","message":"Fleet health summary","classification":{"intent":"summary","confidence":0.3333333333333333,"flightIdMention":false}}
 {"ts":"2025-09-03T15:01:38.040Z","backend":"azure","event":"dispatch","model":"gpt-4o","messages":2}
 {"ts":"2025-09-03T15:01:40.569Z","backend":"azure","event":"reply","status":200,"reply":"The squadron has a total of 20 flights. None are fully operational without issues. 12 flights have warnings, and 8 have critical issues. 60% (12 flights) are deployable, while 8 are in service or planned for maintenance."}
+{"ts":"2025-10-01T20:22:53.538Z","backend":"azure","event":"route-hit","path":"/api/ai-chat"}
+{"ts":"2025-10-01T20:22:53.539Z","backend":"azure","event":"classification","message":"Fleet health summary","classification":{"intent":"summary","confidence":0.8333333333333334,"carIdMention":false}}
+{"ts":"2025-10-01T20:22:53.538Z","backend":"azure","event":"request","message":"Fleet health summary","carId":null,"promptId":null}
+{"ts":"2025-10-01T20:22:53.539Z","backend":"azure","event":"local-reply","carId":null,"message":"Fleet health summary","reply":"Fleet summary (from local data):\n- Total vehicles: 5\n- Cars all good: 1\n- Cars with warnings: 1\n- Cars with critical issues: 3\n- Operational: 2 (40%)\n- Out-of-service/maintenance planned: 3\n- Out-of-service IDs: [\"BMW-X5M-001\",\"BMW-X5M-003\",\"BMW-X5M-004\"]\n\nIf you want details for a specific vehicle, mention its car id (for example: BMW-X5M-003)."}
+{"ts":"2025-10-01T20:22:56.847Z","backend":"azure","event":"route-hit","path":"/api/ai-chat"}
+{"ts":"2025-10-01T20:22:56.847Z","backend":"azure","event":"request","message":"Upcoming maintenance for current vehicle","carId":null,"promptId":null}
+{"ts":"2025-10-01T20:22:56.848Z","backend":"azure","event":"classification","message":"Upcoming maintenance for current vehicle","classification":{"intent":"other","confidence":0,"carIdMention":false}}
+{"ts":"2025-10-01T22:15:27.873Z","backend":"azure","event":"request","message":"Upcoming maintenance for current vehicle","carId":null,"promptId":null}
+{"ts":"2025-10-01T22:15:27.872Z","backend":"azure","event":"route-hit","path":"/api/ai-chat"}
+{"ts":"2025-10-01T22:15:27.874Z","backend":"azure","event":"classification","message":"Upcoming maintenance for current vehicle","classification":{"intent":"other","confidence":0,"carIdMention":false}}
+{"ts":"2025-10-01T22:21:52.953Z","backend":"azure","event":"route-hit","path":"/api/ai-chat"}
+{"ts":"2025-10-01T22:21:52.953Z","backend":"azure","event":"request","message":"Fleet health summary","carId":null,"promptId":null}
+{"ts":"2025-10-01T22:21:52.954Z","backend":"azure","event":"classification","message":"Fleet health summary","classification":{"intent":"summary","confidence":0.8333333333333334,"carIdMention":false}}
+{"ts":"2025-10-01T22:21:52.955Z","backend":"azure","event":"local-reply","carId":null,"message":"Fleet health summary","reply":"Fleet summary (from local data):\n- Total vehicles: 5\n- Cars all good: 1\n- Cars with warnings: 1\n- Cars with critical issues: 3\n- Operational: 2 (40%)\n- Out-of-service/maintenance planned: 3\n- Out-of-service IDs: [\"BMW-X5M-001\",\"BMW-X5M-003\",\"BMW-X5M-004\"]\n\nIf you want details for a specific vehicle, mention its car id (for example: BMW-X5M-003)."}
+{"ts":"2025-10-01T22:21:55.886Z","backend":"azure","event":"route-hit","path":"/api/ai-chat"}
+{"ts":"2025-10-01T22:21:55.886Z","backend":"azure","event":"request","message":"Upcoming maintenance for current vehicle","carId":null,"promptId":null}
+{"ts":"2025-10-01T22:21:55.887Z","backend":"azure","event":"classification","message":"Upcoming maintenance for current vehicle","classification":{"intent":"other","confidence":0,"carIdMention":false}}

@@ -1,0 +1,84 @@
+{
+  "cars": [
+    {
+      "id": "BMW-X5M-001",
+      "displayName": "BMW X5M - Vehicle 001",
+      "year": 2016,
+      "model": "X5M",
+      "vin": "WBSFR9C50GC123456",
+      "mileage": 45000,
+      "components": [
+        { "id": "engine", "attachTo": "chassis", "displayName": "V8 Twin-Turbo Engine", "status": "Good", "componentName": "S63 4.4L V8 Engine", "maintenanceDue": "5000 miles", "priorityLevel": "LOW", "descriptionText": "Engine running smoothly with optimal performance metrics.", "markerOffset": [0, 0.5, 1.2], "cameraOffset": [0, 1, 3] },
+        { "id": "transmission", "attachTo": "chassis", "displayName": "8-Speed Automatic", "status": "Warning", "componentName": "ZF 8HP70 Transmission", "maintenanceDue": "2000 miles", "priorityLevel": "MEDIUM", "descriptionText": "Minor shift hesitation detected in sport mode.", "markerOffset": [0, 0.3, 0.8], "cameraOffset": [0, 0.8, 2.5] },
+        { "id": "brakes", "attachTo": "car_bmw_x5m_2014_Meshcaliper", "displayName": "M Performance Brakes", "status": "Good", "componentName": "Brembo Brake System", "maintenanceDue": "10000 miles", "priorityLevel": "LOW", "descriptionText": "Brake pads and rotors within normal wear limits.", "markerOffset": [0, 0.2, 0.5], "cameraOffset": [0, 0.5, 1.5] },
+        { "id": "suspension", "attachTo": "chassis", "displayName": "Adaptive M Suspension", "status": "Good", "componentName": "Electronic Damping Control", "maintenanceDue": "15000 miles", "priorityLevel": "LOW", "descriptionText": "Suspension system operating within normal parameters.", "markerOffset": [0, 0.1, 0.3], "cameraOffset": [0, 0.3, 1] },
+        { "id": "electronics", "attachTo": "chassis", "displayName": "iDrive System", "status": "Warning", "componentName": "BMW iDrive 4.0", "maintenanceDue": "Software Update", "priorityLevel": "MEDIUM", "descriptionText": "Navigation system requires software update.", "markerOffset": [0, 0.8, 0.2], "cameraOffset": [0, 1.2, 0.8] },
+        { "id": "tires", "attachTo": "tire", "displayName": "Performance Tires", "status": "Critical", "componentName": "Michelin Pilot Sport 4S", "maintenanceDue": "Immediate", "priorityLevel": "HIGH", "descriptionText": "Front tires showing excessive wear, replacement required.", "markerOffset": [0, 0.1, 0.4], "cameraOffset": [0, 0.4, 1.2] }
+      ]
+    },
+    {
+      "id": "BMW-X5M-002",
+      "displayName": "BMW X5M - Vehicle 002",
+      "year": 2016,
+      "model": "X5M",
+      "vin": "WBSFR9C50GC123457",
+      "mileage": 52000,
+      "components": [
+        { "id": "engine", "attachTo": "chassis", "displayName": "V8 Twin-Turbo Engine", "status": "Warning", "componentName": "S63 4.4L V8 Engine", "maintenanceDue": "1000 miles", "priorityLevel": "MEDIUM", "descriptionText": "Engine oil change due soon, turbo boost pressure slightly low.", "markerOffset": [0, 0.5, 1.2], "cameraOffset": [0, 1, 3] },
+        { "id": "transmission", "attachTo": "chassis", "displayName": "8-Speed Automatic", "status": "Good", "componentName": "ZF 8HP70 Transmission", "maintenanceDue": "8000 miles", "priorityLevel": "LOW", "descriptionText": "Transmission fluid recently changed, shifting smoothly.", "markerOffset": [0, 0.3, 0.8], "cameraOffset": [0, 0.8, 2.5] },
+        { "id": "brakes", "attachTo": "car_bmw_x5m_2014_Meshcaliper", "displayName": "M Performance Brakes", "status": "Good", "componentName": "Brembo Brake System", "maintenanceDue": "12000 miles", "priorityLevel": "LOW", "descriptionText": "Brake system in excellent condition.", "markerOffset": [0, 0.2, 0.5], "cameraOffset": [0, 0.5, 1.5] },
+        { "id": "suspension", "attachTo": "chassis", "displayName": "Adaptive M Suspension", "status": "Warning", "componentName": "Electronic Damping Control", "maintenanceDue": "5000 miles", "priorityLevel": "MEDIUM", "descriptionText": "Rear shock absorbers showing signs of wear.", "markerOffset": [0, 0.1, 0.3], "cameraOffset": [0, 0.3, 1] },
+        { "id": "electronics", "attachTo": "chassis", "displayName": "iDrive System", "status": "Good", "componentName": "BMW iDrive 4.0", "maintenanceDue": "Regular Updates", "priorityLevel": "LOW", "descriptionText": "All systems functioning normally.", "markerOffset": [0, 0.8, 0.2], "cameraOffset": [0, 1.2, 0.8] },
+        { "id": "tires", "attachTo": "tire", "displayName": "Performance Tires", "status": "Good", "componentName": "Michelin Pilot Sport 4S", "maintenanceDue": "15000 miles", "priorityLevel": "LOW", "descriptionText": "Tire tread depth within acceptable range.", "markerOffset": [0, 0.1, 0.4], "cameraOffset": [0, 0.4, 1.2] }
+      ]
+    },
+    {
+      "id": "BMW-X5M-003",
+      "displayName": "BMW X5M - Vehicle 003",
+      "year": 2016,
+      "model": "X5M",
+      "vin": "WBSFR9C50GC123458",
+      "mileage": 38000,
+      "components": [
+        { "id": "engine", "attachTo": "chassis", "displayName": "V8 Twin-Turbo Engine", "status": "Good", "componentName": "S63 4.4L V8 Engine", "maintenanceDue": "7000 miles", "priorityLevel": "LOW", "descriptionText": "Engine performance optimal, all sensors reading normal.", "markerOffset": [0, 0.5, 1.2], "cameraOffset": [0, 1, 3] },
+        { "id": "transmission", "attachTo": "chassis", "displayName": "8-Speed Automatic", "status": "Good", "componentName": "ZF 8HP70 Transmission", "maintenanceDue": "10000 miles", "priorityLevel": "LOW", "descriptionText": "Transmission operating smoothly in all modes.", "markerOffset": [0, 0.3, 0.8], "cameraOffset": [0, 0.8, 2.5] },
+        { "id": "brakes", "attachTo": "car_bmw_x5m_2014_Meshcaliper", "displayName": "M Performance Brakes", "status": "Critical", "componentName": "Brembo Brake System", "maintenanceDue": "Immediate", "priorityLevel": "HIGH", "descriptionText": "Brake fluid contamination detected, system flush required.", "markerOffset": [0, 0.2, 0.5], "cameraOffset": [0, 0.5, 1.5] },
+        { "id": "suspension", "attachTo": "chassis", "displayName": "Adaptive M Suspension", "status": "Good", "componentName": "Electronic Damping Control", "maintenanceDue": "20000 miles", "priorityLevel": "LOW", "descriptionText": "Suspension components in excellent condition.", "markerOffset": [0, 0.1, 0.3], "cameraOffset": [0, 0.3, 1] },
+        { "id": "electronics", "attachTo": "chassis", "displayName": "iDrive System", "status": "Warning", "componentName": "BMW iDrive 4.0", "maintenanceDue": "Diagnostic Required", "priorityLevel": "MEDIUM", "descriptionText": "Bluetooth connectivity issues reported.", "markerOffset": [0, 0.8, 0.2], "cameraOffset": [0, 1.2, 0.8] },
+        { "id": "tires", "attachTo": "tire", "displayName": "Performance Tires", "status": "Good", "componentName": "Michelin Pilot Sport 4S", "maintenanceDue": "20000 miles", "priorityLevel": "LOW", "descriptionText": "Tires in good condition with even wear pattern.", "markerOffset": [0, 0.1, 0.4], "cameraOffset": [0, 0.4, 1.2] }
+      ]
+    },
+    {
+      "id": "BMW-X5M-004",
+      "displayName": "BMW X5M - Vehicle 004",
+      "year": 2016,
+      "model": "X5M",
+      "vin": "WBSFR9C50GC123459",
+      "mileage": 61000,
+      "components": [
+        { "id": "engine", "attachTo": "chassis", "displayName": "V8 Twin-Turbo Engine", "status": "Critical", "componentName": "S63 4.4L V8 Engine", "maintenanceDue": "Immediate", "priorityLevel": "HIGH", "descriptionText": "Engine misfire detected in cylinder 3, diagnostic required.", "markerOffset": [0, 0.5, 1.2], "cameraOffset": [0, 1, 3] },
+        { "id": "transmission", "attachTo": "chassis", "displayName": "8-Speed Automatic", "status": "Good", "componentName": "ZF 8HP70 Transmission", "maintenanceDue": "5000 miles", "priorityLevel": "LOW", "descriptionText": "Transmission fluid service completed recently.", "markerOffset": [0, 0.3, 0.8], "cameraOffset": [0, 0.8, 2.5] },
+        { "id": "brakes", "attachTo": "car_bmw_x5m_2014_Meshcaliper", "displayName": "M Performance Brakes", "status": "Warning", "componentName": "Brembo Brake System", "maintenanceDue": "3000 miles", "priorityLevel": "MEDIUM", "descriptionText": "Brake pads approaching replacement threshold.", "markerOffset": [0, 0.2, 0.5], "cameraOffset": [0, 0.5, 1.5] },
+        { "id": "suspension", "attachTo": "chassis", "displayName": "Adaptive M Suspension", "status": "Good", "componentName": "Electronic Damping Control", "maintenanceDue": "10000 miles", "priorityLevel": "LOW", "descriptionText": "Suspension system functioning normally.", "markerOffset": [0, 0.1, 0.3], "cameraOffset": [0, 0.3, 1] },
+        { "id": "electronics", "attachTo": "chassis", "displayName": "iDrive System", "status": "Good", "componentName": "BMW iDrive 4.0", "maintenanceDue": "Regular Updates", "priorityLevel": "LOW", "descriptionText": "All electronic systems operational.", "markerOffset": [0, 0.8, 0.2], "cameraOffset": [0, 1.2, 0.8] },
+        { "id": "tires", "attachTo": "tire", "displayName": "Performance Tires", "status": "Warning", "componentName": "Michelin Pilot Sport 4S", "maintenanceDue": "5000 miles", "priorityLevel": "MEDIUM", "descriptionText": "Rear tires showing uneven wear pattern.", "markerOffset": [0, 0.1, 0.4], "cameraOffset": [0, 0.4, 1.2] }
+      ]
+    },
+    {
+      "id": "BMW-X5M-005",
+      "displayName": "BMW X5M - Vehicle 005",
+      "year": 2016,
+      "model": "X5M",
+      "vin": "WBSFR9C50GC123460",
+      "mileage": 29000,
+      "components": [
+        { "id": "engine", "attachTo": "chassis", "displayName": "V8 Twin-Turbo Engine", "status": "Good", "componentName": "S63 4.4L V8 Engine", "maintenanceDue": "11000 miles", "priorityLevel": "LOW", "descriptionText": "Engine in excellent condition, recently serviced.", "markerOffset": [0, 0.5, 1.2], "cameraOffset": [0, 1, 3] },
+        { "id": "transmission", "attachTo": "chassis", "displayName": "8-Speed Automatic", "status": "Good", "componentName": "ZF 8HP70 Transmission", "maintenanceDue": "15000 miles", "priorityLevel": "LOW", "descriptionText": "Transmission performing optimally.", "markerOffset": [0, 0.3, 0.8], "cameraOffset": [0, 0.8, 2.5] },
+        { "id": "brakes", "attachTo": "car_bmw_x5m_2014_Meshcaliper", "displayName": "M Performance Brakes", "status": "Good", "componentName": "Brembo Brake System", "maintenanceDue": "18000 miles", "priorityLevel": "LOW", "descriptionText": "Brake system in perfect condition.", "markerOffset": [0, 0.2, 0.5], "cameraOffset": [0, 0.5, 1.5] },
+        { "id": "suspension", "attachTo": "chassis", "displayName": "Adaptive M Suspension", "status": "Good", "componentName": "Electronic Damping Control", "maintenanceDue": "25000 miles", "priorityLevel": "LOW", "descriptionText": "Suspension components like new.", "markerOffset": [0, 0.1, 0.3], "cameraOffset": [0, 0.3, 1] },
+        { "id": "electronics", "attachTo": "chassis", "displayName": "iDrive System", "status": "Good", "componentName": "BMW iDrive 4.0", "maintenanceDue": "Regular Updates", "priorityLevel": "LOW", "descriptionText": "All systems functioning perfectly.", "markerOffset": [0, 0.8, 0.2], "cameraOffset": [0, 1.2, 0.8] },
+        { "id": "tires", "attachTo": "tire", "displayName": "Performance Tires", "status": "Good", "componentName": "Michelin Pilot Sport 4S", "maintenanceDue": "25000 miles", "priorityLevel": "LOW", "descriptionText": "Tires in excellent condition with minimal wear.", "markerOffset": [0, 0.1, 0.4], "cameraOffset": [0, 0.4, 1.2] }
+      ]
+    }
+  ]
+}

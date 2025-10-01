@@ -1,4 +1,4 @@
-# A400 Webapp (A400M interactive viewer)
+# BMW Fleet Monitor (BMW X5M Interactive Vehicle Management)
 
 =====================================
 
@@ -6,7 +6,7 @@ Short description
 
 -----------------
 
-This repository contains a single-page interactive 3D viewer for the A400M aircraft with gesture control, AI chat integration (proxied via a Node/Express server), flight/health data stored under `data/`, and simple file-based logging under `data/logs/`.
+This repository contains a single-page interactive 3D viewer for BMW X5M vehicles with gesture control, AI chat integration (proxied via a Node/Express server), vehicle/health data stored under `data/`, and simple file-based logging under `data/logs/`.
 
 Quick start
 

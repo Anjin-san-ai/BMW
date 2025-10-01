@@ -5,7 +5,7 @@ const https = require('https');
 const router = express.Router();
 
 module.exports = function(config){
-  const FLIGHTS_FILE = config.flightsFile;
+  const CARS_FILE = config.carsFile;
   const AZURE = config.azure;
   const promptsPath = path.join(__dirname, '..', 'prompts.json');
   let prompts = {};
@@ -28,72 +28,72 @@ module.exports = function(config){
     let score = 0;
     // strong signals
     if (/\bhow many\b/.test(t)) score += 3;
-    if (/\bsquadron summary\b|\bsquadron\b/.test(t)) score += 3;
+    if (/\bfleet summary\b|\bfleet\b/.test(t)) score += 3;
     if (/\boverall health\b|\boverall status\b/.test(t)) score += 2;
-    if (/\bdeployable\b|\bdeployable state\b|\bnon-deployable\b/.test(t)) score += 2;
-    if (/\btotal aircraft\b|\btotal flights\b/.test(t)) score += 2;
+    if (/\boperational\b|\boperational state\b|\bout-of-service\b/.test(t)) score += 2;
+    if (/\btotal vehicles\b|\btotal cars\b/.test(t)) score += 2;
     // moderate signals
     if (/\bsummary\b/.test(t)) score += 1;
     if (/\bhealth\b/.test(t)) score += 1;
-    // presence of a flight id reduces ambiguity but still relevant
-    const flightIdMention = /a400-\d{1,2}/.test(t);
-    if (flightIdMention) score += 1;
+    // presence of a car id reduces ambiguity but still relevant
+    const carIdMention = /bmw-x5m-\d{1,2}/.test(t);
+    if (carIdMention) score += 1;
     // normalize to confidence 0..1 (max possible ~8)
     const confidence = Math.min(1, score / 6);
     const intent = confidence > 0.25 ? 'summary' : 'other';
-    return { intent, confidence, flightIdMention };
+    return { intent, confidence, carIdMention };
   }
 
   router.post('/', async (req, res) => {
     try {
-  const { message, flightId, history, promptId, bypassLocal } = req.body || {};
+  const { message, carId, history, promptId, bypassLocal } = req.body || {};
   if (!message || typeof message !== 'string') return res.status(400).json({ error: 'missing message' });
 
   // log incoming request summary (do not log secrets)
   appendAiLog({ event: 'route-hit', path: '/api/ai-chat' });
-  appendAiLog({ event: 'request', message: String(message).slice(0,512), flightId: flightId || null, promptId: promptId || null });
-  console.log(`[AI] request flight=${flightId||'<none>'} prompt=${promptId||'default'} msg="${String(message).slice(0,120).replace(/\n/g,' ')}"`);
+  appendAiLog({ event: 'request', message: String(message).slice(0,512), carId: carId || null, promptId: promptId || null });
+  console.log(`[AI] request car=${carId||'<none>'} prompt=${promptId||'default'} msg="${String(message).slice(0,120).replace(/\n/g,' ')}"`);
 
-      // load flights master file
-      let flightsPayload = {};
-      try { flightsPayload = JSON.parse(fs.readFileSync(FLIGHTS_FILE, 'utf8')); } catch (e) { flightsPayload = {}; }
+      // load cars master file
+      let carsPayload = {};
+      try { carsPayload = JSON.parse(fs.readFileSync(CARS_FILE, 'utf8')); } catch (e) { carsPayload = {}; }
 
-      // select flight context
-      let flightInfo = null;
-      if (flightId) {
-        const f = (flightsPayload.flights || []).find(x => x.id === flightId);
-        if (f) {
-          const perFile = path.join(config.dataDir, 'flights', `${flightId}.json`);
-          try { if (fs.existsSync(perFile)) flightInfo = JSON.parse(fs.readFileSync(perFile, 'utf8')); else flightInfo = f; } catch(e) { flightInfo = f; }
+      // select car context
+      let carInfo = null;
+      if (carId) {
+        const c = (carsPayload.cars || []).find(x => x.id === carId);
+        if (c) {
+          const perFile = path.join(config.dataDir, 'cars', `${carId}.json`);
+          try { if (fs.existsSync(perFile)) carInfo = JSON.parse(fs.readFileSync(perFile, 'utf8')); else carInfo = c; } catch(e) { carInfo = c; }
         }
       }
 
   // classifyIntent is defined at module scope and invoked per-request below
 
       // helpers to compute summaries
-      function computeSquadron(payload) {
-        const allFlights = (payload.flights || []);
+      function computeFleet(payload) {
+        const allCars = (payload.cars || []);
         const statusRank = { 'Good': 0, 'Warning': 1, 'Critical': 2 };
-        let total = allFlights.length;
-        let countGoodFlights = 0, countWarningFlights = 0, countCriticalFlights = 0;
-        let deployableCount = 0;
+        let total = allCars.length;
+        let countGoodCars = 0, countWarningCars = 0, countCriticalCars = 0;
+        let operationalCount = 0;
         const criticalIds = [];
-        allFlights.forEach(f => {
-          const comps = f.components || [];
+        allCars.forEach(c => {
+          const comps = c.components || [];
           let worst = 0;
-          comps.forEach(c => { const r = statusRank[c.status] !== undefined ? statusRank[c.status] : 1; if (r > worst) worst = r; });
-          if (worst === 2) { countCriticalFlights++; criticalIds.push(f.id); } else if (worst === 1) countWarningFlights++; else countGoodFlights++;
-          if (worst < 2) deployableCount++;
+          comps.forEach(comp => { const r = statusRank[comp.status] !== undefined ? statusRank[comp.status] : 1; if (r > worst) worst = r; });
+          if (worst === 2) { countCriticalCars++; criticalIds.push(c.id); } else if (worst === 1) countWarningCars++; else countGoodCars++;
+          if (worst < 2) operationalCount++;
         });
-        const inServiceCount = total - deployableCount;
-        const deployablePct = total > 0 ? Math.round((deployableCount/total)*100) : 0;
-        return { total, countGoodFlights, countWarningFlights, countCriticalFlights, deployableCount, deployablePct, inServiceCount, criticalIds };
+        const outOfServiceCount = total - operationalCount;
+        const operationalPct = total > 0 ? Math.round((operationalCount/total)*100) : 0;
+        return { total, countGoodCars, countWarningCars, countCriticalCars, operationalCount, operationalPct, outOfServiceCount, criticalIds };
       }
 
-      function computeFlightSummary(f) {
-        const comps = (f && f.components) || [];
-        const critical = comps.find(c => String(c.status).toLowerCase() === 'critical');
-        const warning = comps.find(c => String(c.status).toLowerCase() === 'warning');
+      function computeCarSummary(c) {
+        const comps = (c && c.components) || [];
+        const critical = comps.find(comp => String(comp.status).toLowerCase() === 'critical');
+        const warning = comps.find(comp => String(comp.status).toLowerCase() === 'warning');
         const worst = critical ? 'Critical' : (warning ? 'Warning' : 'Good');
         let keyIssue = null;
   if (critical) keyIssue = `${critical.componentName || critical.displayName || critical.id} (${critical.faultCode || 'N/A'}) = Critical (maintenanceDue: ${critical.maintenanceDue || 'unknown'})`;
@@ -106,24 +106,24 @@ module.exports = function(config){
   const cls = classifyIntent(message);
   // persist classifier result for debugging/visibility
   try { appendAiLog({ event: 'classification', message: String(message).slice(0,256), classification: cls }); } catch(e) {}
-  try { console.log(`[AI] classification intent=${cls.intent} confidence=${cls.confidence.toFixed(2)} flightMention=${cls.flightIdMention}`); } catch(e) {}
+  try { console.log(`[AI] classification intent=${cls.intent} confidence=${cls.confidence.toFixed(2)} carMention=${cls.carIdMention}`); } catch(e) {}
       try {
   if (!bypassLocal && cls.intent === 'summary' && cls.confidence >= 0.7) {
           // confident: return deterministic local reply
-          const squad = computeSquadron(flightsPayload);
+          const fleet = computeFleet(carsPayload);
           let reply = '';
-          if (flightInfo) {
-            const flightSummary = computeFlightSummary(flightInfo);
-            reply += `Context: ${flightInfo.id}\n\n`;
-            reply += `I\u2019m currently scoped to ${flightInfo.displayName || flightInfo.id}. Do you want:\n- A: a short summary for this selected aircraft, or\n- B: a squadron-level summary (aggregate across all flights)?\n\n`;
-            reply += `If you want the squadron summary now, here\'s the latest from the dataset:\n- Total aircraft: ${squad.total}\n- Deployable (no Critical components): ${squad.deployableCount} (${squad.deployablePct}%)\n- Non-deployable (\u2265 1 Critical): ${squad.countCriticalFlights} (${Math.round((squad.countCriticalFlights/squad.total)*100)}%) — IDs: ${JSON.stringify(squad.criticalIds)}\n\n`;
-            reply += `Quick summary for ${flightInfo.id}:\n- Worst status: ${flightSummary.worst}\n- Key issue: ${flightSummary.keyIssue} — aircraft is ${flightSummary.worst === 'Critical' ? 'non-deployable' : 'deployable'} until the issue is resolved.\n\nTell me which view you want (A or B), or ask for per-component details for ${flightInfo.id}.`;
+          if (carInfo) {
+            const carSummary = computeCarSummary(carInfo);
+            reply += `Context: ${carInfo.id}\n\n`;
+            reply += `I\u2019m currently scoped to ${carInfo.displayName || carInfo.id}. Do you want:\n- A: a short summary for this selected vehicle, or\n- B: a fleet-level summary (aggregate across all vehicles)?\n\n`;
+            reply += `If you want the fleet summary now, here\'s the latest from the dataset:\n- Total vehicles: ${fleet.total}\n- Operational (no Critical components): ${fleet.operationalCount} (${fleet.operationalPct}%)\n- Out-of-service (\u2265 1 Critical): ${fleet.countCriticalCars} (${Math.round((fleet.countCriticalCars/fleet.total)*100)}%) — IDs: ${JSON.stringify(fleet.criticalIds)}\n\n`;
+            reply += `Quick summary for ${carInfo.id}:\n- Worst status: ${carSummary.worst}\n- Key issue: ${carSummary.keyIssue} — vehicle is ${carSummary.worst === 'Critical' ? 'out-of-service' : 'operational'} until the issue is resolved.\n\nTell me which view you want (A or B), or ask for per-component details for ${carInfo.id}.`;
           } else {
-            reply += `Squadron summary (from local data):\n- Total aircraft: ${squad.total}\n- Flights all good: ${squad.countGoodFlights}\n- Flights with warnings: ${squad.countWarningFlights}\n- Flights with critical issues: ${squad.countCriticalFlights}\n- Deployable: ${squad.deployableCount} (${squad.deployablePct}%)\n- In-service/maintenance planned: ${squad.inServiceCount}\n`;
-            if (squad.criticalIds && squad.criticalIds.length) reply += `- Non-deployable IDs: ${JSON.stringify(squad.criticalIds)}\n`;
-            reply += `\nIf you want details for a specific aircraft, mention its flight id (for example: A400-03).`;
+            reply += `Fleet summary (from local data):\n- Total vehicles: ${fleet.total}\n- Cars all good: ${fleet.countGoodCars}\n- Cars with warnings: ${fleet.countWarningCars}\n- Cars with critical issues: ${fleet.countCriticalCars}\n- Operational: ${fleet.operationalCount} (${fleet.operationalPct}%)\n- Out-of-service/maintenance planned: ${fleet.outOfServiceCount}\n`;
+            if (fleet.criticalIds && fleet.criticalIds.length) reply += `- Out-of-service IDs: ${JSON.stringify(fleet.criticalIds)}\n`;
+            reply += `\nIf you want details for a specific vehicle, mention its car id (for example: BMW-X5M-003).`;
           }
-          appendAiLog({ event: 'local-reply', flightId: flightId || null, message: String(message).slice(0,512), reply: reply.slice(0,2000) });
+          appendAiLog({ event: 'local-reply', carId: carId || null, message: String(message).slice(0,512), reply: reply.slice(0,2000) });
           return res.json({ reply });
         }
       } catch (e) {

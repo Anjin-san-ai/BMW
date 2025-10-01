@@ -1,0 +1,132 @@
+{
+  "id": "BMW-X5M-004",
+  "displayName": "BMW X5M - Vehicle 004",
+  "components": [
+    {
+      "id": "engine",
+      "attachTo": "chassis",
+      "displayName": "V8 Twin-Turbo Engine",
+      "status": "Critical",
+      "componentName": "S63 4.4L V8 Engine",
+      "maintenanceDue": "Immediate",
+      "priorityLevel": "HIGH",
+      "descriptionText": "Engine misfire detected in cylinder 3, diagnostic required.",
+      "markerOffset": [
+        0,
+        0.5,
+        1.2
+      ],
+      "cameraOffset": [
+        0,
+        1,
+        3
+      ],
+      "faultCode": "ER001"
+    },
+    {
+      "id": "transmission",
+      "attachTo": "chassis",
+      "displayName": "8-Speed Automatic",
+      "status": "Good",
+      "componentName": "ZF 8HP70 Transmission",
+      "maintenanceDue": "5000 miles",
+      "priorityLevel": "LOW",
+      "descriptionText": "Transmission fluid service completed recently.",
+      "markerOffset": [
+        0,
+        0.3,
+        0.8
+      ],
+      "cameraOffset": [
+        0,
+        0.8,
+        2.5
+      ],
+      "faultCode": "ER002"
+    },
+    {
+      "id": "brakes",
+      "attachTo": "car_bmw_x5m_2014_Meshcaliper",
+      "displayName": "M Performance Brakes",
+      "status": "Warning",
+      "componentName": "Brembo Brake System",
+      "maintenanceDue": "3000 miles",
+      "priorityLevel": "MEDIUM",
+      "descriptionText": "Brake pads approaching replacement threshold.",
+      "markerOffset": [
+        0,
+        0.2,
+        0.5
+      ],
+      "cameraOffset": [
+        0,
+        0.5,
+        1.5
+      ],
+      "faultCode": "ER003"
+    },
+    {
+      "id": "suspension",
+      "attachTo": "chassis",
+      "displayName": "Adaptive M Suspension",
+      "status": "Good",
+      "componentName": "Electronic Damping Control",
+      "maintenanceDue": "10000 miles",
+      "priorityLevel": "LOW",
+      "descriptionText": "Suspension system functioning normally.",
+      "markerOffset": [
+        0,
+        0.1,
+        0.3
+      ],
+      "cameraOffset": [
+        0,
+        0.3,
+        1
+      ],
+      "faultCode": "ER004"
+    },
+    {
+      "id": "electronics",
+      "attachTo": "chassis",
+      "displayName": "iDrive System",
+      "status": "Good",
+      "componentName": "BMW iDrive 4.0",
+      "maintenanceDue": "Regular Updates",
+      "priorityLevel": "LOW",
+      "descriptionText": "All electronic systems operational.",
+      "markerOffset": [
+        0,
+        0.8,
+        0.2
+      ],
+      "cameraOffset": [
+        0,
+        1.2,
+        0.8
+      ],
+      "faultCode": "ER005"
+    },
+    {
+      "id": "tires",
+      "attachTo": "tire",
+      "displayName": "Performance Tires",
+      "status": "Warning",
+      "componentName": "Michelin Pilot Sport 4S",
+      "maintenanceDue": "5000 miles",
+      "priorityLevel": "MEDIUM",
+      "descriptionText": "Rear tires showing uneven wear pattern.",
+      "markerOffset": [
+        0,
+        0.1,
+        0.4
+      ],
+      "cameraOffset": [
+        0,
+        0.4,
+        1.2
+      ],
+      "faultCode": "ER006"
+    }
+  ]
+}

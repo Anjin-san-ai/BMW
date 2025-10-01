@@ -4,7 +4,7 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 module.exports = {
   port: process.env.PORT || 3000,
   dataDir: path.join(__dirname, '..', 'data'),
-  flightsFile: path.join(__dirname, '..', 'data', 'flights.json'),
+  carsFile: path.join(__dirname, '..', 'data', 'cars.json'),
   logsDir: path.join(__dirname, '..', 'data', 'logs'),
   azure: {
     endpoint: process.env.AZURE_OPENAI_ENDPOINT,

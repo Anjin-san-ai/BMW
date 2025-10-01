@@ -1,0 +1,76 @@
+{
+  "fleet": {
+    "totalVehicles": 5,
+    "activeVehicles": 4,
+    "maintenanceRequired": 2,
+    "criticalIssues": 1
+  },
+  "summary": {
+    "engineHealth": {
+      "good": 3,
+      "warning": 1,
+      "critical": 1
+    },
+    "transmissionHealth": {
+      "good": 4,
+      "warning": 1,
+      "critical": 0
+    },
+    "brakeHealth": {
+      "good": 3,
+      "warning": 1,
+      "critical": 1
+    },
+    "suspensionHealth": {
+      "good": 3,
+      "warning": 2,
+      "critical": 0
+    },
+    "electronicsHealth": {
+      "good": 3,
+      "warning": 2,
+      "critical": 0
+    },
+    "tireHealth": {
+      "good": 3,
+      "warning": 1,
+      "critical": 1
+    }
+  },
+  "maintenanceSchedule": {
+    "immediate": [
+      {
+        "vehicleId": "BMW-X5M-001",
+        "component": "tires",
+        "description": "Front tires showing excessive wear, replacement required",
+        "priority": "HIGH"
+      },
+      {
+        "vehicleId": "BMW-X5M-003",
+        "component": "brakes",
+        "description": "Brake fluid contamination detected, system flush required",
+        "priority": "HIGH"
+      },
+      {
+        "vehicleId": "BMW-X5M-004",
+        "component": "engine",
+        "description": "Engine misfire detected in cylinder 3, diagnostic required",
+        "priority": "HIGH"
+      }
+    ],
+    "scheduled": [
+      {
+        "vehicleId": "BMW-X5M-002",
+        "component": "engine",
+        "description": "Engine oil change due in 1000 miles",
+        "priority": "MEDIUM"
+      },
+      {
+        "vehicleId": "BMW-X5M-001",
+        "component": "transmission",
+        "description": "Transmission service due in 2000 miles",
+        "priority": "MEDIUM"
+      }
+    ]
+  }
+}

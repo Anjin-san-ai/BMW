@@ -40,72 +40,72 @@ app.put('/api/tuner', (req, res) => {
   });
 });
 
-// flights API - list available flights
-app.get('/api/flights', (req, res) => {
-  fs.readFile(config.flightsFile, 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'failed to read flights' });
-    try { const payload = JSON.parse(data); return res.json(payload); } catch(e) { return res.status(500).json({ error: 'invalid flights file' }); }
+// cars API - list available cars
+app.get('/api/cars', (req, res) => {
+  fs.readFile(config.carsFile, 'utf8', (err, data) => {
+    if (err) return res.status(500).json({ error: 'failed to read cars' });
+    try { const payload = JSON.parse(data); return res.json(payload); } catch(e) { return res.status(500).json({ error: 'invalid cars file' }); }
   });
 });
 
-// squadron summary: totals and deployable/in-service counts
-app.get('/api/squadron-summary', (req, res) => {
-  fs.readFile(config.flightsFile, 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'failed to read flights' });
+// fleet summary: totals and operational/out-of-service counts
+app.get('/api/fleet-summary', (req, res) => {
+  fs.readFile(config.carsFile, 'utf8', (err, data) => {
+    if (err) return res.status(500).json({ error: 'failed to read cars' });
     try {
       const payload = JSON.parse(data);
-      const all = (payload.flights || []);
+      const all = (payload.cars || []);
       const statusRank = { 'Good': 0, 'Warning': 1, 'Critical': 2 };
       let total = all.length;
-      let countGoodFlights = 0, countWarningFlights = 0, countCriticalFlights = 0;
-      let deployableCount = 0;
-      const perFlight = all.map(f => {
-        const comps = f.components || [];
+      let countGoodCars = 0, countWarningCars = 0, countCriticalCars = 0;
+      let operationalCount = 0;
+      const perCar = all.map(c => {
+        const comps = c.components || [];
         let worst = 0;
-        comps.forEach(c => {
-          const r = statusRank[c.status] !== undefined ? statusRank[c.status] : 1;
+        comps.forEach(comp => {
+          const r = statusRank[comp.status] !== undefined ? statusRank[comp.status] : 1;
           if (r > worst) worst = r;
         });
-        if (worst === 2) countCriticalFlights++; else if (worst === 1) countWarningFlights++; else countGoodFlights++;
-        if (worst < 2) deployableCount++;
-        return { id: f.id, displayName: f.displayName, worstStatus: worst === 2 ? 'Critical' : (worst === 1 ? 'Warning' : 'Good') };
+        if (worst === 2) countCriticalCars++; else if (worst === 1) countWarningCars++; else countGoodCars++;
+        if (worst < 2) operationalCount++;
+        return { id: c.id, displayName: c.displayName, worstStatus: worst === 2 ? 'Critical' : (worst === 1 ? 'Warning' : 'Good') };
       });
-      const inServiceCount = total - deployableCount;
-      const deployablePct = total > 0 ? Math.round((deployableCount/total)*100) : 0;
-      return res.json({ totalFlights: total, flightsAllGood: countGoodFlights, flightsWithWarnings: countWarningFlights, flightsWithCritical: countCriticalFlights, deployableCount, deployablePct, inServiceCount, perFlight });
-    } catch(e) { return res.status(500).json({ error: 'invalid flights file' }); }
+      const outOfServiceCount = total - operationalCount;
+      const operationalPct = total > 0 ? Math.round((operationalCount/total)*100) : 0;
+      return res.json({ totalCars: total, carsAllGood: countGoodCars, carsWithWarnings: countWarningCars, carsWithCritical: countCriticalCars, operationalCount, operationalPct, outOfServiceCount, perCar });
+    } catch(e) { return res.status(500).json({ error: 'invalid cars file' }); }
   });
 });
 
-// get specific flight data (if a per-flight file exists in data/flights/<id>.json will prefer that)
-app.get('/api/flights/:id', (req, res) => {
+// get specific car data (if a per-car file exists in data/cars/<id>.json will prefer that)
+app.get('/api/cars/:id', (req, res) => {
   const id = req.params.id;
-  const perFile = path.join(__dirname, 'data', 'flights', `${id}.json`);
+  const perFile = path.join(__dirname, 'data', 'cars', `${id}.json`);
   fs.readFile(perFile, 'utf8', (err, data) => {
     if (!err) {
       try { return res.json(JSON.parse(data)); } catch(e) { /* fallthrough to default list */ }
     }
-    fs.readFile(config.flightsFile, 'utf8', (err2, d2) => {
-      if (err2) return res.status(404).json({ error: 'flight not found' });
+    fs.readFile(config.carsFile, 'utf8', (err2, d2) => {
+      if (err2) return res.status(404).json({ error: 'car not found' });
       try {
         const all = JSON.parse(d2);
-        const f = (all.flights || []).find(x => x.id === id);
-        if (!f) return res.status(404).json({ error: 'flight not found' });
-        return res.json(f);
-      } catch(e) { return res.status(500).json({ error: 'invalid flights file' }); }
+        const c = (all.cars || []).find(x => x.id === id);
+        if (!c) return res.status(404).json({ error: 'car not found' });
+        return res.json(c);
+      } catch(e) { return res.status(500).json({ error: 'invalid cars file' }); }
     });
   });
 });
 
-// save per-flight data
-app.put('/api/flights/:id', (req, res) => {
+// save per-car data
+app.put('/api/cars/:id', (req, res) => {
   const id = req.params.id;
   const payload = req.body || {};
-  const dir = path.join(__dirname, 'data', 'flights');
+  const dir = path.join(__dirname, 'data', 'cars');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const perFile = path.join(dir, `${id}.json`);
   fs.writeFile(perFile, JSON.stringify(payload, null, 2), (err) => {
-    if (err) return res.status(500).json({ error: 'failed to save flight' });
+    if (err) return res.status(500).json({ error: 'failed to save car' });
     return res.json({ saved: true });
   });
 });
@@ -185,4 +185,4 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`A400 webapp running on http://localhost:${PORT} (env=${config.nodeEnv})`));
+app.listen(PORT, () => console.log(`BMW Fleet Monitor running on http://localhost:${PORT} (env=${config.nodeEnv})`));

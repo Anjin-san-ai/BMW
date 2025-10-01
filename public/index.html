@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentry AI - Holographic Fleet Monitor [Definitive Fix]</title>
+    <title>BMW Fleet Monitor - Holographic Vehicle Management System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,35 +11,14 @@
 </head>
 <body>
     <div id="component-list-panel"><h3>Components & Health</h3><div id="component-list"></div></div>
-    <!-- Flight selector -->
-    <div id="flight-selector" style="position:fixed;left:50%;top:18px;transform:translateX(-50%);width:360px;background:rgba(2,6,12,0.9);padding:12px;border-radius:8px;z-index:130;display:none;border:1px solid rgba(0,255,255,0.06);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:var(--sci-fi-cyan)"><strong>Flight Selector</strong><button id="close-flight-selector" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--sci-fi-cyan);padding:4px 8px;border-radius:6px;cursor:pointer">Close</button></div>
-        <select id="flight-dropdown" style="width:100%;padding:8px;border-radius:6px;background:#041018;color:#dff;border:1px solid rgba(0,255,255,0.06);">
+    <!-- Vehicle selector -->
+    <div id="vehicle-selector" style="position:fixed;left:50%;top:18px;transform:translateX(-50%);width:360px;background:rgba(2,6,12,0.9);padding:12px;border-radius:8px;z-index:130;display:none;border:1px solid rgba(0,255,255,0.06);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:var(--sci-fi-cyan)"><strong>Vehicle Selector</strong><button id="close-vehicle-selector" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--sci-fi-cyan);padding:4px 8px;border-radius:6px;cursor:pointer">Close</button></div>
+        <select id="vehicle-dropdown" style="width:100%;padding:8px;border-radius:6px;background:#041018;color:#dff;border:1px solid rgba(0,255,255,0.06);">
         </select>
-        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;"><button id="load-flight" class="tutorial-btn primary">Load</button></div>
-    </div>
-    <!-- arrow overlay removed -->
-    <!-- gesture tuner (temporary debug UI) -->
-    <div id="gesture-tuner" style="position:fixed;left:18px;top:18px;transform:translateY(80px);width:320px;background:rgba(0,0,0,0.6);padding:10px;border-radius:8px;z-index:120;box-shadow:0 12px 40px rgba(0,0,0,0.6);display:none;flex-direction:column;gap:8px;font-size:13px;color:#bfe;">
-        <div style="display:flex;justify-content:space-between;align-items:center"><strong style="color:var(--sci-fi-cyan)">Gesture Tuner</strong><button id="hide-tuner" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--sci-fi-cyan);padding:4px 8px;border-radius:6px;cursor:pointer">Hide</button></div>
-        <label>Zoom Scale <span id="tz-val" style="float:right">12000</span></label>
-        <input id="tz" type="range" min="1000" max="40000" step="250" value="12000">
-        <label>Pinch Enter <span id="pe-val" style="float:right">0.09</span></label>
-        <input id="pe" type="range" min="0.02" max="0.25" step="0.005" value="0.09">
-        <label>Pinch Leave <span id="pl-val" style="float:right">0.12</span></label>
-        <input id="pl" type="range" min="0.03" max="0.35" step="0.005" value="0.12">
-        <label>Sensitivity <span id="sens-val" style="float:right">1.0</span></label>
-        <input id="sens" type="range" min="0.4" max="2.0" step="0.02" value="1.0">
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px;">
-            <label style="font-size:12px;opacity:0.9;">Precision Mode</label>
-            <input id="precision-toggle" type="checkbox" title="When held via modifier pinch, reduces acceleration for fine control">
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button id="learn-cal" class="tutorial-btn">Learn</button>
-        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;"><button id="load-vehicle" class="tutorial-btn primary">Load</button></div>
     </div>
     <div id="canvas-container"></div>
-    <div id="mode-badge">Mode: Mouse</div>
     <div id="fps-counter">FPS: --</div>
         <div id="help-panel" class="collapsed" aria-expanded="false">
             <div class="help-header" role="button" tabindex="0" aria-controls="help-body">
@@ -54,26 +33,15 @@
             <div id="help-body" class="help-body">
                 <div class="help-content">
                     <div class="help-line">
-                        <strong>G</strong> toggle Gesture mode · <strong>C</strong> start/collect Calibration · <strong>D</strong> toggle Debug anchors
+                        <strong>F</strong> open Vehicle selector · <strong>D</strong> toggle Debug anchors · <strong>R</strong> reset camera
                     </div>
                     <div class="help-line">
-                        <strong>F</strong> open Flight selector · <strong>T</strong> toggle Gesture Tuner UI · <strong>I</strong> invert gesture X mapping · <strong>Z</strong> toggle invert zoom
-                    </div>
-                    <div class="help-line">
-                        <strong>[</strong>/<strong>]</strong> decrease/increase pitch scale · <strong>,</strong>/<strong>.</strong> decrease/increase yaw scale · <strong>0</strong> reset gesture scales
-                    </div>
-                    <div class="help-line">
-                        <strong>Esc</strong> close overlays / cancel calibration · <strong>←</strong>/<strong>→</strong> tutorial navigation
+                        <strong>Esc</strong> close overlays · <strong>←</strong>/<strong>→</strong> tutorial navigation
                     </div>
                     <div class="help-controls">
                         <label class="control-label">Test Mode</label>
                         <input id="test-mode-toggle" type="checkbox" title="Enable test mode: pixel overlays + 1Hz logging">
                     </div>
-                    <div class="help-controls">
-                        <label class="control-label">Gesture Debug</label>
-                        <input id="gesture-debug-toggle" type="checkbox" title="Show/Hide gesture debug panel">
-                    </div>
-                    <div id="cal-progress" class="help-cal"><i></i></div>
                     <div class="help-links">Need a refresher? <a href="#" id="reopen-tour">Show tour</a> · <a href="#" id="list-nodes">List model nodes</a></div>
                 </div>
             </div>
@@ -82,8 +50,8 @@
     <div id="tutorial-overlay">
         <div class="backdrop"></div>
         <div id="tutorial-card">
-            <h2>Welcome to Sentry AI Holographic Monitor</h2>
-            <p id="tutorial-text">A quick tour will show core controls: mouse, gestures, calibration, and how to inspect components.</p>
+            <h2>Welcome to BMW Fleet Monitor</h2>
+            <p id="tutorial-text">A quick tour will show core controls: mouse navigation, component inspection, and AI assistance.</p>
             <div id="tutorial-progress"></div>
             <div id="tutorial-controls">
                 <button id="tutorial-skip" class="tutorial-btn">Skip</button>
@@ -104,18 +72,7 @@
         </div>
         <p id="info-description"></p>
     </div>
-    <div id="control-hint">Controls: Mouse — Move & click · Gesture — Pinch to click</div>
-    <!-- Camera zoom slider (controls camera distance only) -->
-    <div id="camera-zoom-ui" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:420px;background:rgba(0,0,0,0.6);padding:10px;border-radius:8px;z-index:200;display:flex;gap:8px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,0.45);">
-        <label style="color:var(--sci-fi-cyan);font-weight:700;margin-right:6px;">Camera</label>
-        <input id="camera-zoom-slider" type="range" min="100" max="60000" step="10" style="flex:1;" />
-        <div id="camera-zoom-val" style="width:86px;text-align:right;color:#bfe;font-size:13px;">--</div>
-    </div>
-    <div id="webcam-container">
-        <video id="webcam-feed" autoplay playsinline></video>
-        <canvas id="overlay-canvas"></canvas>
-    </div>
-    <!-- AI Chat widget (bottom-right, hidden when gesture mode is active) -->
+    <!-- AI Chat widget -->
     <div id="ai-chat" style="position:fixed;right:40px;bottom:40px;width:520px;height:680px;backdrop-filter:blur(14px) saturate(140%);background:rgba(10,22,32,0.55);border:1px solid rgba(0,255,255,0.18);border-radius:18px;padding:0;box-shadow:0 28px 90px -8px rgba(0,0,0,0.65),0 0 0 1px rgba(0,255,255,0.08) inset;z-index:260;display:none;flex-direction:column;overflow:hidden;transform:translateY(18px) scale(.92);opacity:0;">
         <div id="ai-chat-header" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid rgba(0,255,255,0.12);background:linear-gradient(90deg,rgba(0,40,60,0.55),rgba(0,20,30,0.3));user-select:none;">
             <div style="display:flex;align-items:center;gap:10px;flex:1;">
@@ -130,12 +87,12 @@
             </div>
         </div>
         <div id="ai-messages" style="padding:16px 18px 12px 18px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;">
-            <div style="font-size:12px;color:#bfe;opacity:0.9">Ask about a flight (e.g. "A400-01 status") or type "fleet summary". Use natural language; tables will auto-format.</div>
+            <div style="font-size:12px;color:#bfe;opacity:0.9">Ask about a vehicle (e.g. "BMW-X5M-001 status") or type "fleet summary". Use natural language; tables will auto-format.</div>
         </div>
         <div style="padding:12px 14px 16px 14px;border-top:1px solid rgba(0,255,255,0.1);display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,rgba(0,20,30,0.35),rgba(0,15,25,0.4));">
             <div id="ai-suggestions" style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="ai-suggest" data-q="Fleet health summary" style="flex:1;min-width:140px;">Fleet health summary</button>
-                <button class="ai-suggest" data-q="Upcoming maintenance for current flight" style="flex:1;min-width:160px;">Upcoming maintenance</button>
+                <button class="ai-suggest" data-q="Upcoming maintenance for current vehicle" style="flex:1;min-width:160px;">Upcoming maintenance</button>
                 <button class="ai-suggest" data-q="Critical components at risk" style="flex:1;min-width:160px;">Critical risks</button>
             </div>
             <div style="display:flex;gap:10px;align-items:center;">
@@ -240,12 +197,6 @@
     <!-- All Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
     </script>
@@ -304,14 +255,14 @@
                 const now = Date.now();
                 if (cache && (now - cacheAt) < 30000) return cache; // 30s cache
                 try {
-                    const listRes = await fetch('/api/flights');
+                    const listRes = await fetch('/api/cars');
                     if (!listRes.ok) throw new Error('list');
                     const listData = await listRes.json();
-                    const flights = listData.flights || [];
+                    const flights = listData.cars || [];
                     const detailed = [];
                     for (const f of flights){
                         try {
-                            const fr = await fetch(`/api/flights/${encodeURIComponent(f.id)}`);
+                            const fr = await fetch(`/api/cars/${encodeURIComponent(f.id)}`);
                             if (fr.ok){ detailed.push(await fr.json()); }
                         } catch(e){}
                     }
@@ -518,49 +469,67 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
     // --- SCENE & RENDERER ---
         const canvasContainer = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
+        
+        // Professional gradient background (lighter, neutral grey-blue)
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+        gradient.addColorStop(0, '#303741');  // Top: Brighter neutral grey-blue (48, 55, 65)
+        gradient.addColorStop(1, '#14191E');  // Bottom: Subtle dark grey (20, 25, 30)
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 256, 256);
+        const texture = new THREE.CanvasTexture(canvas);
+        scene.background = texture;
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000);
         const initialCameraPosition = new THREE.Vector3();
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    // Slightly higher exposure for brighter overall appearance
-    renderer.toneMappingExposure = 1.35;
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    // Professional color management: Balanced exposure for natural look
+    renderer.toneMappingExposure = 1.2;
+    renderer.outputEncoding = THREE.sRGBEncoding; // Standard sRGB for web/monitor display
     // Enable soft shadows (kept very subtle)
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         canvasContainer.appendChild(renderer.domElement);
- 
-    // darker grey background for high contrast and to match UI
-    scene.background = new THREE.Color(0x0b0f14);
 
-    // --- Brighter, low-contrast lighting setup ---
-    // Stronger ambient to lift shadowed areas
-    const ambient = new THREE.AmbientLight(0x0e1820, 1.35);
+    // --- PROFESSIONAL 3-POINT LIGHTING SETUP ---
+    
+    // 1. KEY LIGHT (Main Directional Light) - Strong, creates primary shadows and highlights
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.5); // High intensity for strong key
+    keyLight.position.set(3500, 8000, 4200);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048); // Higher quality shadows
+    keyLight.shadow.camera.near = 10;
+    keyLight.shadow.camera.far = 25000;
+    const shCam = keyLight.shadow.camera;
+    shCam.left = -9000; shCam.right = 9000; shCam.top = 9000; shCam.bottom = -9000;
+    keyLight.shadow.bias = -0.0002;
+    keyLight.shadow.normalBias = 0.4;
+    scene.add(keyLight);
+
+    // 2. FILL LIGHTS (Ambient + Hemisphere) - Soften shadows, ~50% of key light
+    // Ambient: Neutral white (D65 6500K standard daylight)
+    const ambient = new THREE.AmbientLight(0xffffff, 1.75); // Fill light, creates depth
     scene.add(ambient);
-    // Hemisphere for soft environmental wrap (higher intensity for brightness, warmer ground tint to neutralize cool shadows)
-    const hemisphereLight = new THREE.HemisphereLight(0x9fdfff, 0x1a242c, 1.6);
+    
+    // Hemisphere: Subtle environmental wrap
+    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.75); // Matching fill intensity
     hemisphereLight.position.set(0, 1, 0);
     scene.add(hemisphereLight);
 
-    // Key directional light (reduced intensity, softened shadow influence)
-    const dirLight = new THREE.DirectionalLight(0xdff6ff, 1.6);
-    dirLight.position.set(3500, 8000, 4200);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.set(1024, 1024); // smaller to keep shadows soft / less defined
-    dirLight.shadow.camera.near = 10;
-    dirLight.shadow.camera.far = 25000;
-    const shCam = dirLight.shadow.camera;
-    shCam.left = -9000; shCam.right = 9000; shCam.top = 9000; shCam.bottom = -9000;
-    dirLight.shadow.bias = -0.0002;
-    dirLight.shadow.normalBias = 0.4;
-    scene.add(dirLight);
+    // 3. RIM/BACK LIGHT - Creates separation and edge definition from behind
+    const rimLight = new THREE.DirectionalLight(0xffffff, 2.8); // Strong rim for separation
+    rimLight.position.set(-6000, 3000, -8000); // Behind and to the side of model
+    scene.add(rimLight);
 
-    // Broad area-style fill using a second (non-shadow) directional to wash remaining dark zones
-    const fillDir = new THREE.DirectionalLight(0xb0e8ff, 0.9);
-    fillDir.position.set(-6000, 5000, -3000);
-    scene.add(fillDir);
+    // 4. ACCENT LIGHT - Subtle fill for remaining dark zones
+    const accentLight = new THREE.DirectionalLight(0xe8f4ff, 0.6); // Very subtle cool tint
+    accentLight.position.set(4000, 2000, -2000);
+    scene.add(accentLight);
 
     // Subtle rim accent (reduced distance & intensity for less contrast)
     const rimLightBack = new THREE.PointLight(0x66ddff, 0.25, 22000);
@@ -594,7 +563,7 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
         })();
 
     // subtle depth fog for dark background (very low density)
-    scene.fog = new THREE.FogExp2(0x0b0f14, 0.00012);
+    // scene.fog = new THREE.FogExp2(0x0b0f14, 0.00012); // Temporarily disabled for debugging
 
         // enable soft shadows on renderer
         renderer.shadowMap.enabled = true;
@@ -618,7 +587,7 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
            const selected = localStorage.getItem('selectedFlight');
            if (!selected) return;
            try {
-               const res = await fetch(`/api/flights/${encodeURIComponent(selected)}`);
+               const res = await fetch(`/api/cars/${encodeURIComponent(selected)}`);
                if (!res.ok) return;
                const payload = await res.json();
                componentData = payload.components || [];
@@ -628,16 +597,16 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
        // helper functions to populate flight selector UI
        async function loadFlightsList() {
            try {
-               const res = await fetch('/api/flights');
+               const res = await fetch('/api/cars');
                if (!res.ok) return [];
                const payload = await res.json();
-               return payload.flights || [];
+               return payload.cars || [];
            } catch (e) { console.warn('failed to load flights', e); return []; }
        }
 
        async function loadFlightById(id) {
            try {
-               const res = await fetch(`/api/flights/${encodeURIComponent(id)}`);
+               const res = await fetch(`/api/cars/${encodeURIComponent(id)}`);
                if (!res.ok) throw new Error('flight not found');
                const payload = await res.json();
                let comps = (payload.components || []);
@@ -654,17 +623,17 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                    return c;
                });
 
-               // If no components present for this flight, attempt to copy from a template (A400-01)
+               // If no components present for this vehicle, attempt to copy from a template (BMW-X5M-001)
                if (!comps || comps.length === 0) {
                    try {
-                       const tplRes = await fetch('/api/flights/A400-01');
+                       const tplRes = await fetch('/api/cars/BMW-X5M-001');
                        if (tplRes.ok) {
                            const tpl = await tplRes.json();
                            const tplComps = tpl.components || [];
                            if (tplComps && tplComps.length) {
                                // persist copied components for the selected flight
                                const savePayload = Object.assign({}, { id: id, displayName: payload.displayName || id, components: tplComps });
-                               const saveRes = await fetch(`/api/flights/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savePayload) });
+                               const saveRes = await fetch(`/api/cars/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savePayload) });
                                if (saveRes.ok) {
                                    comps = tplComps;
                                } else {
@@ -683,7 +652,7 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                    (async () => {
                        try {
                            const savePayload = { id: id, displayName: payload.displayName || id, components: comps };
-                           const saveRes = await fetch(`/api/flights/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savePayload) });
+                           const saveRes = await fetch(`/api/cars/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savePayload) });
                            if (saveRes && saveRes.ok) {
                                console.info && console.info('persisted fault codes for', id);
                            } else {
@@ -695,14 +664,14 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                // rebuild markers live without reloading
                try {
                    // compute model size for reasonable marker scaling
-                   if (aircraftModel) {
-                       const box = new THREE.Box3().setFromObject(aircraftModel);
+                   if (vehicleModel) {
+                       const box = new THREE.Box3().setFromObject(vehicleModel);
                        const size = box.getSize(new THREE.Vector3());
                        const maxDim = Math.max(size.x, size.y, size.z);
                        createMarkersForComponents(componentData, maxDim);
                    } else {
                        // queue creation until model ready
-                       pendingMarkerCreate = { components: componentData.slice(), maxDim: DEFAULT_AIRCRAFT_SCALE * 1000 };
+                       pendingMarkerCreate = { components: componentData.slice(), maxDim: DEFAULT_VEHICLE_SCALE * 1000 };
                    }
                } catch (e) { console.warn('live rebuild failed', e); }
            } catch (e) { console.warn('load flight failed', e); alert('Failed to load flight: ' + id); }
@@ -712,7 +681,7 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
 
        async function initFlightSelectorUI() {
            const flights = await loadFlightsList();
-           const dropdown = document.getElementById('flight-dropdown');
+           const dropdown = document.getElementById('vehicle-dropdown');
            if (!dropdown) return;
            dropdown.innerHTML = '';
            flights.forEach(f => {
@@ -721,8 +690,8 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
            });
            const saved = localStorage.getItem('selectedFlight');
            if (saved) dropdown.value = saved;
-           document.getElementById('load-flight').addEventListener('click', ()=>{ const id = dropdown.value; if (id) loadFlightById(id); });
-           document.getElementById('close-flight-selector').addEventListener('click', ()=>{ document.getElementById('flight-selector').style.display = 'none'; });
+           document.getElementById('load-vehicle').addEventListener('click', ()=>{ const id = dropdown.value; if (id) loadFlightById(id); });
+           document.getElementById('close-vehicle-selector').addEventListener('click', ()=>{ document.getElementById('vehicle-selector').style.display = 'none'; });
        }
 
        // initialize flight selector UI (non-blocking)
@@ -735,26 +704,26 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
             async function loadDefaultFlightIfEmpty() {
                 if (componentData && componentData.length) return;
                 try {
-                    const res = await fetch('/api/flights');
+                    const res = await fetch('/api/cars');
                     if (!res.ok) return;
                     const payload = await res.json();
-                    const first = (payload.flights || [])[0];
+                    const first = (payload.cars || [])[0];
                     if (first && first.components && first.components.length) {
                         componentData = first.components;
                         // ensure selector UI shows the first flight as selected
-                        try { const dd = document.getElementById('flight-dropdown'); if (dd) dd.value = first.id; } catch(e){}
+                        try { const dd = document.getElementById('vehicle-dropdown'); if (dd) dd.value = first.id; } catch(e){}
                     }
                 } catch (e) { console.warn('failed to load default flight', e); }
             }
             try { await loadDefaultFlightIfEmpty(); } catch(e){}
         })();
-    // default visual scale for the aircraft model (tweak to make model larger/smaller)
-    const DEFAULT_AIRCRAFT_SCALE = 4.5;
-    // When true the on-screen slider is the only way to change camera distance/zoom.
-    const SLIDER_ONLY_CAMERA = true;
+    // default visual scale for the car model (tweak to make model larger/smaller)
+    const DEFAULT_VEHICLE_SCALE = 50.0; // Increased scale to make car visible
+    // Camera will automatically position to fit the car model
+    const SLIDER_ONLY_CAMERA = false;
         
         // --- INTERACTIVE ELEMENTS ---
-    let aircraftModel, markers = [], markerAnchors = [], markerColliders = [], hoveredObject = null, selectedObject = null, pendingMarkerCreate = null;
+    let vehicleModel, markers = [], markerAnchors = [], markerColliders = [], hoveredObject = null, selectedObject = null, pendingMarkerCreate = null;
         const statusColors = { 'Good': '#22C55E', 'Warning': '#F59E0B', 'Critical': '#EF4444' };
 
     function createScannerTexture(color) {
@@ -832,14 +801,14 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
 
         // Create markers from componentData. maxDim used to scale markers reasonably.
         function createMarkersForComponents(components, maxDim) {
-            if (!aircraftModel) {
+            if (!vehicleModel) {
                 // queue for later when model is loaded
                 pendingMarkerCreate = { components: components.slice(), maxDim };
                 return;
             }
             clearMarkers();
             components.forEach((data) => {
-                const targetObject = aircraftModel.getObjectByName(data.attachTo);
+                const targetObject = vehicleModel.getObjectByName(data.attachTo);
                 if (!targetObject) return;
                 const { texture, animate } = createScannerTexture(statusColors[data.status]);
                 const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, sizeAttenuation: true });
@@ -911,49 +880,73 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
         const loader = new GLTFLoader();
     loader.load('scene.gltf', 
             (gltf) => {
-                aircraftModel = gltf.scene;
-                scene.add(aircraftModel);
-                // apply global scale so the aircraft appears larger by default
-                try { aircraftModel.scale.multiplyScalar(DEFAULT_AIRCRAFT_SCALE); } catch(e) { /* ignore if not applicable */ }
+                console.log('BMW model loaded successfully:', gltf);
+                vehicleModel = gltf.scene;
+                console.log('Adding vehicle model to scene:', vehicleModel);
+                scene.add(vehicleModel);
+                console.log('Scene children count:', scene.children.length);
+                // apply global scale so the vehicle appears appropriately sized
+                try { vehicleModel.scale.multiplyScalar(DEFAULT_VEHICLE_SCALE); } catch(e) { /* ignore if not applicable */ }
                 
-                const box = new THREE.Box3().setFromObject(aircraftModel);
+                const box = new THREE.Box3().setFromObject(vehicleModel);
                 const size = box.getSize(new THREE.Vector3());
                 const center = box.getCenter(new THREE.Vector3());
+                console.log('Model bounds - size:', size, 'center:', center);
                 controls.target.copy(center);
                 initialControlsTarget.copy(center);
                 const maxDim = Math.max(size.x, size.y, size.z);
+                // Position camera to nicely frame the car model
                 const fov = camera.fov * (Math.PI / 180);
-                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                cameraZ *= 1.5;
-                camera.position.copy(center);
-                camera.position.z += cameraZ;
+                let cameraDistance = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                // Adjust multiplier to fit car nicely in viewport (2.0 gives good framing with some space)
+                cameraDistance *= 2.0;
+                
+                // Position camera at an attractive angle (slightly elevated and to the side)
+                camera.position.set(
+                    center.x + cameraDistance * 0.5,
+                    center.y + maxDim * 0.3,
+                    center.z + cameraDistance * 0.8
+                );
+                camera.lookAt(center);
                 initialCameraPosition.copy(camera.position);
-                controls.maxDistance = size.length() * 2;
-                controls.minDistance = size.length() / 4;
+                console.log('Camera positioned at:', camera.position);
+                
+                // Set reasonable zoom limits
+                controls.maxDistance = cameraDistance * 3;
+                controls.minDistance = maxDim * 0.5;
+                controls.enableZoom = true;
                 controls.update();
 
                 // add a subtle ground ring and contact shadow to visually anchor the model
                 (function addGround() {
-                    // remove existing ground if reloading
                     if (scene.userData._groundAdded) return;
                     const ringSize = Math.max(maxDim * 1.4, 1200);
-                    // soft radial gradient canvas texture
                     const texSize = 1024;
-                    const grdCanvas = document.createElement('canvas'); grdCanvas.width = texSize; grdCanvas.height = texSize;
+                    const grdCanvas = document.createElement('canvas'); 
+                    grdCanvas.width = texSize; 
+                    grdCanvas.height = texSize;
                     const gctx = grdCanvas.getContext('2d');
                     const grad = gctx.createRadialGradient(texSize/2, texSize/2, texSize*0.02, texSize/2, texSize/2, texSize/2);
                     grad.addColorStop(0, 'rgba(0,255,255,0.14)');
                     grad.addColorStop(0.4, 'rgba(0,120,150,0.06)');
                     grad.addColorStop(1, 'rgba(0,0,0,0)');
-                    gctx.fillStyle = grad; gctx.fillRect(0,0,texSize,texSize);
+                    gctx.fillStyle = grad; 
+                    gctx.fillRect(0,0,texSize,texSize);
                     const groundTex = new THREE.CanvasTexture(grdCanvas);
-                    groundTex.encoding = THREE.sRGBEncoding; groundTex.needsUpdate = true;
+                    groundTex.encoding = THREE.sRGBEncoding; 
+                    groundTex.needsUpdate = true;
 
-                    const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, transparent: true, opacity: 1.0, depthWrite: false });
+                    const groundMat = new THREE.MeshStandardMaterial({ 
+                        map: groundTex, 
+                        transparent: true, 
+                        opacity: 1.0, 
+                        depthWrite: false 
+                    });
                     const groundGeo = new THREE.PlaneGeometry(ringSize, ringSize);
                     const ground = new THREE.Mesh(groundGeo, groundMat);
                     ground.rotation.x = -Math.PI / 2;
-                    ground.position.copy(center); ground.position.y = center.y - (size.y * 0.5) - 12;
+                    ground.position.copy(center); 
+                    ground.position.y = center.y - (size.y * 0.5) - 12;
                     ground.receiveShadow = true;
                     scene.add(ground);
                     scene.userData._groundAdded = true;
@@ -965,8 +958,6 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                 if (pendingMarkerCreate) {
                     try { createMarkersForComponents(pendingMarkerCreate.components, pendingMarkerCreate.maxDim); } catch(e) { console.warn('processing pendingMarkerCreate failed', e); }
                 }
-                // initialize camera slider now that camera/controls have min/max distance set
-                try { initCameraSlider(); } catch(e) { console.warn('initCameraSlider failed', e); }
             },
             undefined, (error) => { console.error("MODEL LOADING FAILED:", error); }
         );
@@ -1065,566 +1056,6 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
             renderer.domElement.addEventListener('click', () => { document.querySelectorAll('.component-item.active').forEach(e=>e.classList.remove('active')); });
         }
 
-        // --- HYBRID CONTROL & GESTURE LOGIC ---
-        const webcamContainer = document.getElementById('webcam-container');
-        const controlHint = document.getElementById('control-hint');
-        let handTimeout, lastHandPos = null, isPinching = false, wasPinching = false, lastClickTime = 0, fistDetectedTime = 0;
-
-        // controlMode: 'mouse' | 'gesture' — starts in mouse
-        let controlMode = 'mouse';
-        function setControlMode(mode) {
-            if (controlMode === mode) return;
-            controlMode = mode;
-            controlHint.innerText = mode === 'gesture' ? 'Controls: Gesture active — Pinch to click' : 'Controls: Mouse active — Move & click';
-            // update HUD badge
-            const badge = document.getElementById('mode-badge'); if (badge) badge.innerText = 'Mode: ' + (mode === 'gesture' ? 'Gesture' : 'Mouse');
-            // show/hide webcam overlay and enable controls accordingly
-            if (mode === 'gesture') { webcamContainer.classList.add('visible'); controls.enabled = false; }
-            else { webcamContainer.classList.remove('visible'); controls.enabled = true; }
-            // Show/hide AI chat widget based on control mode
-            const aiChatWidget = document.getElementById('ai-chat');
-            if (aiChatWidget) {
-                aiChatWidget.style.display = mode === 'gesture' ? 'none' : 'flex';
-            }
-            // subtle feedback
-            gsap.fromTo(controlHint, { y: -6, opacity: 0.6 }, { y: 0, opacity: 0.95, duration: 0.35, ease: 'power2.out' });
-        }
-
-        function onResults(results) {
-            const webcamCanvas = document.getElementById('overlay-canvas');
-            const webcamCtx = webcamCanvas.getContext('2d');
-            webcamCtx.clearRect(0, 0, webcamCanvas.width, webcamCanvas.height);
-            clearTimeout(handTimeout);
-            
-            // detect a two-thumb precision modifier when two hands are present and thumbs are close
-            window.precisionModifierActive = false;
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length === 2) {
-                try {
-                    const t1 = results.multiHandLandmarks[0][4];
-                    const t2 = results.multiHandLandmarks[1][4];
-                    const d = Math.hypot(t1.x - t2.x, t1.y - t2.y);
-                    if (d < 0.06) window.precisionModifierActive = true;
-                } catch(e) { window.precisionModifierActive = false; }
-            }
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const landmarks = results.multiHandLandmarks[0];
-                drawConnectors(webcamCtx, landmarks, HAND_CONNECTIONS, { color: '#00FFFF', lineWidth: 2 });
-                drawLandmarks(webcamCtx, landmarks, { color: '#FFFFFF', radius: 4 });
-
-                // Only process gestures when user has explicitly enabled gesture mode via 'G'
-                if (controlMode === 'gesture') {
-                    webcamContainer.classList.add('visible');
-                    controls.enabled = false;
-                    handleSingleHand(landmarks);
-
-                    // draw calibration guidance overlay on webcam if calibration active
-                    if (calibrationOverlay && calibrationOverlay.style.display === 'flex') {
-                        // cal-box is inside calibration overlay; we draw a guiding dot on the webcam overlay to match index tip
-                        const ix = landmarks[8].x; const iy = landmarks[8].y;
-                        const mirrored = isVideoMirrored();
-                        const drawX = mirrored ? (1 - ix) * webcamCanvas.width : ix * webcamCanvas.width;
-                        const drawY = iy * webcamCanvas.height;
-                        webcamCtx.beginPath(); webcamCtx.arc(drawX, drawY, 8, 0, Math.PI*2); webcamCtx.fillStyle = 'rgba(0,255,255,0.9)'; webcamCtx.fill();
-                        // draw dashed target in upper-right where cal-box is located (no exact overlay mapping, helpful visual)
-                        webcamCtx.strokeStyle = 'rgba(0,255,255,0.35)'; webcamCtx.setLineDash([6,6]); webcamCtx.strokeRect(webcamCanvas.width - 260, 10, 240, 140); webcamCtx.setLineDash([]);
-                    }
-                } else {
-                    // in mouse mode we render the overlay but keep mouse controls active
-                    controls.enabled = true;
-                }
-            } else {
-                handTimeout = setTimeout(() => {
-                    // hide webcam overlay when no hand is detected; do NOT change controlMode automatically
-                    webcamContainer.classList.remove('visible');
-                    // keep controls enabled for mouse mode, keep disabled for explicit gesture mode
-                    controls.enabled = (controlMode !== 'gesture');
-                }, 1500);
-            }
-        }
-
-        function isVideoMirrored(){
-            try{
-                const s = window.getComputedStyle(videoElement);
-                const t = s.transform || s.webkitTransform || '';
-                if (!t || t === 'none') return false;
-                // matrix(a, b, c, d, e, f) -> check a (scaleX) component
-                const m = t.match(/matrix\(([^)]+)\)/);
-                if (m && m[1]){
-                    const parts = m[1].split(',').map(p=>parseFloat(p.trim()));
-                    if (parts.length >= 1) return parts[0] < 0;
-                }
-                // fallback: check inline transform string
-                return (videoElement.style.transform && videoElement.style.transform.includes('scaleX(-1)'));
-            }catch(e){return true;}
-        }
-        
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    // allow two-hand detection so we can support a two-thumb precision modifier gesture
-    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-        hands.onResults(onResults);
-        
-        const videoElement = document.getElementById('webcam-feed');
-        const videoCamera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 640, height: 480 });
-        videoCamera.start();
-
-        // audio feedback: create a small WebAudio click generator (more reliable than an empty data URI)
-        const clickAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA='); // keep as fallback
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-        function ensureAudioContext() {
-            if (!audioCtx) {
-                try { audioCtx = new AudioContextClass(); } catch (e) { audioCtx = null; }
-            }
-            return audioCtx;
-        }
-
-        function playClick() {
-            const ctx = ensureAudioContext();
-            if (ctx) {
-                try {
-                    if (ctx.state === 'suspended') ctx.resume();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'square';
-                    osc.frequency.value = 1200;
-                    gain.gain.value = 0.0;
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    const now = ctx.currentTime;
-                    gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.18, now + 0.005);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-                    osc.start(now);
-                    osc.stop(now + 0.1);
-                } catch (err) {
-                    // fall back to HTMLAudioElement if WebAudio fails
-                    try { clickAudio.currentTime = 0; clickAudio.play().catch(()=>{}); } catch(e){}
-                }
-            } else {
-                try { clickAudio.currentTime = 0; clickAudio.play().catch(()=>{}); } catch(e){}
-            }
-        }
-
-        // gesture cursor DOM - create via helper so it's available early and idempotent
-        function ensureGestureCursor() {
-            if (window.gestureCursor) return window.gestureCursor;
-            const el = document.getElementById('gesture-cursor') || document.createElement('div');
-            el.id = 'gesture-cursor';
-            el.style.display = 'none';
-            el.style.position = 'fixed';
-            el.style.width = '26px'; el.style.height = '26px'; el.style.borderRadius = '50%';
-            el.style.margin = '0'; el.style.pointerEvents = 'none';
-            el.style.background = 'radial-gradient(circle at 35% 30%, rgba(0,255,255,0.95), rgba(0,255,255,0.28) 40%, transparent 70%)';
-            el.style.zIndex = '99999';
-            el.style.transform = 'translate(-50%, -50%)';
-            document.body.appendChild(el);
-            window.gestureCursor = el;
-            return el;
-        }
-        const gestureCursor = ensureGestureCursor();
-
-    // reticle for center reference
-    const reticle = document.createElement('div');
-    reticle.id = 'reticle';
-    reticle.style.position = 'absolute'; reticle.style.left = '50%'; reticle.style.top = '50%'; reticle.style.width = '22px'; reticle.style.height = '22px';
-    reticle.style.margin = '-11px 0 0 -11px'; reticle.style.border = '2px solid rgba(0,255,255,0.18)'; reticle.style.borderRadius = '50%'; reticle.style.zIndex = 80; reticle.style.pointerEvents = 'none';
-    document.body.appendChild(reticle);
-
-        // calibration state
-        let calibration = { sx: 0, sy: 0, scaleX: 1, scaleY: 1, calibrated: false };
-        const calibrationOverlay = document.getElementById('calibration-overlay');
-
-        function startCalibration() {
-            calibrationOverlay.style.display = 'flex';
-            setControlMode('gesture');
-            webcamContainer.classList.add('visible');
-        }
-
-        function endCalibration() { calibrationOverlay.style.display = 'none'; calibration.calibrated = true; }
-
-        // collect calibration sample by averaging index tip while user presses C
-        let calibSamples = [];
-
-        window.addEventListener('keydown', (e) => {
-            // don't run calibration shortcut while user is typing in an input/textarea/contentEditable
-            try {
-                const active = document.activeElement;
-                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable) && e.key !== 'Escape') {
-                    return;
-                }
-            } catch (err) {}
-
-            if (e.key === 'c' || e.key === 'C') {
-                // start calibration capture mode (one-shot: capture next frame's index tip)
-                if (calibrationOverlay.style.display !== 'flex') startCalibration();
-                else {
-                    // capture sample
-                    if (lastHandPos) {
-                        calibSamples.push({ x: lastHandPos.x, y: lastHandPos.y });
-                        if (calibSamples.length >= 6) {
-                            // compute average
-                            const avg = calibSamples.reduce((acc, s) => ({ x: acc.x + s.x, y: acc.y + s.y }), { x: 0, y: 0 });
-                            avg.x /= calibSamples.length; avg.y /= calibSamples.length;
-                            // map to normalized device coords center
-                            calibration.sx = avg.x; calibration.sy = avg.y; calibration.calibrated = true; calibSamples = [];
-                            endCalibration();
-                            console.log('Calibration set:', calibration);
-                        } else {
-                            // prompt user to hold and press C multiple times
-                            console.log('Captured calibration sample', calibSamples.length);
-                        }
-                    }
-                }
-            } else if (e.key === 'Escape') {
-                calibrationOverlay.style.display = 'none'; calibSamples = [];
-            }
-        });
-
-    // Improved Kinect-like gesture handler with smoothing, palm-normal rotation and robust pinch
-    let _smooth = { x: 0.5, y: 0.5, z: 0.0, vx:0, vy:0, vz:0 };
-    // gesture runtime config
-        // gesture runtime config (tunable via on-screen sliders)
-        const gestureConfig = { invertXManual: false, invertZoom: false, zoomScale: 12000, yawScale: 6.0, pitchScale: 2.8, pinchEnter: 0.09, pinchLeave: 0.12, pinchMinHold: 70, cursorSmoothing: 0.28 };
-    let pinchStartZ = null, cameraStartDist = null;
-        const SMOOTH_ALPHA = 0.18; // smoothing factor (lower => smoother, more lag)
-    // time-based smoothing helpers and pinch filters
-    let lastGestureTime = performance.now();
-    let pinchFiltered = 1.0, prevPinchFiltered = 1.0, pinchHoldStart = 0;
-    let cursorSmooth = { x: 0.5, y: 0.5 };
-    // hover hysteresis to avoid flicker
-    let hoveredCandidate = null, hoverCandidateStart = 0;
-    const HOVER_HOLD_MS = 80;
-    // sticky-on-proximity vars: when cursor nears an interactive marker it will "snap" and remain
-    // until moved away beyond a release threshold (px) or after a short lock time.
-    let stickyTarget = null; // { marker, sx, sy }
-    let stickyStart = 0;
-    const STICK_RADIUS_PX = 48; // engage when within this many pixels
-    const STICK_RELEASE_PX = 72; // release when moved beyond this many pixels
-    const STICK_LOCK_MS = 80; // minimum lock-in time before allowing release
-    function handleSingleHand(landmarks) {
-            // allow cursor & hover updates even before the 3D model has loaded.
-            // Only gate aircraft-model-specific transforms further down.
-            const gestureCursorLocal = ensureGestureCursor();
-            // landmarks: normalized coordinates where (0,0) top-left, (1,1) bottom-right
-            const indexTip = landmarks[8], thumbTip = landmarks[4], wrist = landmarks[0];
-
-            // map index tip with smoothing filter (simple exponential smoothing)
-            const rawX = indexTip.x, rawY = indexTip.y, rawZ = wrist.z;
-            // predictive smoothing: velocity estimation
-            _smooth.vx = (_smooth.vx * 0.7) + (rawX - _smooth.x) * 0.3;
-            _smooth.vy = (_smooth.vy * 0.7) + (rawY - _smooth.y) * 0.3;
-            _smooth.vz = (_smooth.vz * 0.7) + (rawZ - _smooth.z) * 0.3;
-            _smooth.x += (_smooth.vx + (rawX - _smooth.x) * SMOOTH_ALPHA) * 0.5;
-            _smooth.y += (_smooth.vy + (rawY - _smooth.y) * SMOOTH_ALPHA) * 0.5;
-            _smooth.z += (_smooth.vz + (rawZ - _smooth.z) * SMOOTH_ALPHA) * 0.5;
-
-            let gx = _smooth.x, gy = _smooth.y;
-            if (calibration.calibrated) {
-                gx = (gx - calibration.sx) * (calibration.scaleX || 1) + 0.5;
-                gy = (gy - calibration.sy) * (calibration.scaleY || 1) + 0.5;
-            }
-
-            // Determine effective flip: MediaPipe/video mirroring XOR manual invert toggle
-            const videoMirrored = isVideoMirrored();
-            const effectiveFlip = Boolean(videoMirrored) !== Boolean(gestureConfig.invertXManual);
-            if (effectiveFlip) gx = 1 - gx;
-
-            // clamp to [0,1]
-            gx = Math.min(0.995, Math.max(0.005, gx));
-            gy = Math.min(0.995, Math.max(0.005, gy));
-
-            // NDC coords for raycasting
-            const gesturePointer = new THREE.Vector2(gx * 2 - 1, -(gy * 2 - 1));
-
-            // update gesture cursor (screen) with eased motion - run even if model not present
-            if (controlMode === 'gesture') {
-                gestureCursorLocal.style.display = 'block';
-                const rect = document.body.getBoundingClientRect();
-                const vw = rect.width || window.innerWidth || document.documentElement.clientWidth;
-                const vh = rect.height || window.innerHeight || document.documentElement.clientHeight;
-                const targetX = gx * vw;
-                const targetY = gy * vh;
-                // directly assign left/top to ensure both axes update reliably
-                try {
-                    // prefer GSAP for performance when available, but still set explicit px values
-                    if (window.gsap && typeof gsap.set === 'function') gsap.set(gestureCursorLocal, { left: targetX, top: targetY });
-                } catch(e) {}
-                gestureCursorLocal.style.left = targetX + 'px';
-                gestureCursorLocal.style.top = targetY + 'px';
-                // expose last computed values on the DOM node for quick inspection
-                try { gestureCursorLocal.dataset._lastTargetX = String(targetX); gestureCursorLocal.dataset._lastTargetY = String(targetY); } catch(e){}
-                try {
-                    // richer debug panel output to trace vertical axis values
-                    gestureDebugPanel.innerText = [
-                        `gesture: visible`,
-                        `raw: ${rawX.toFixed(3)}, ${rawY.toFixed(3)}`,
-                        `smooth: ${_smooth.x.toFixed(3)}, ${_smooth.y.toFixed(3)}`,
-                        `cursorSmooth: ${cursorSmooth.x.toFixed(3)}, ${cursorSmooth.y.toFixed(3)}`,
-                        `coords(gx,gy): ${gx.toFixed(3)}, ${gy.toFixed(3)}`,
-                        `target(px): ${targetX.toFixed(1)}, ${targetY.toFixed(1)} (body.h=${rect.height.toFixed(0)})`,
-                        `mirrored:${videoMirrored?'Y':'N'} invertManual:${gestureConfig.invertXManual?'Y':'N'} pinch:${isPinching?'Y':'N'}`
-                    ].join('\n');
-                } catch(e){}
-                // also emit a console.debug so developers can capture frames in devtools
-                try { console.debug('gesture-frame', { rawX, rawY, smoothX: _smooth.x, smoothY: _smooth.y, gx, gy, targetX, targetY, rectHeight: vh }); } catch(e){}
-
-                // update test-mode pixel overlay crosshair if active
-                try {
-                    if (typeof __testMode !== 'undefined' && __testMode) {
-                        const po = ensurePixelOverlay();
-                        let cross = po.querySelector('.test-cross');
-                        if (!cross) {
-                            cross = document.createElement('div');
-                            cross.className = 'test-cross';
-                            cross.style.position = 'absolute';
-                            cross.style.width = '18px'; cross.style.height = '18px';
-                            cross.style.border = '2px solid rgba(0,255,255,0.95)';
-                            cross.style.borderRadius = '50%';
-                            cross.style.transform = 'translate(-50%, -50%)';
-                            cross.style.pointerEvents = 'none';
-                            cross.style.boxShadow = '0 6px 18px rgba(0,255,255,0.12)';
-                            po.appendChild(cross);
-                        }
-                        cross.style.left = targetX + 'px';
-                        cross.style.top = targetY + 'px';
-                        cross.style.display = 'block';
-                    }
-                } catch(e){}
-            } else { gestureCursorLocal.style.display = 'none'; }
-
-            // improved pinch detection with hysteresis & filtering (low-pass) + hold-to-confirm
-            const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
-            // low-pass filter the raw pinch distance to reduce jitter
-            prevPinchFiltered = pinchFiltered;
-            pinchFiltered = pinchFiltered * 0.82 + pinchDist * 0.18;
-            const entering = pinchFiltered < gestureConfig.pinchEnter;
-            const leaving = pinchFiltered > gestureConfig.pinchLeave;
-
-            // hold-based confirmation: only toggle true when filtered pinch is below threshold for pinchMinHold ms
-            if (entering) {
-                if (pinchHoldStart === 0) pinchHoldStart = performance.now();
-                else if (performance.now() - pinchHoldStart > gestureConfig.pinchMinHold) isPinching = true;
-            } else if (leaving) {
-                pinchHoldStart = 0; isPinching = false;
-            }
-
-            // smoothed cursor for improved stability (fractional lerp)
-            cursorSmooth.x += (gx - cursorSmooth.x) * gestureConfig.cursorSmoothing;
-            cursorSmooth.y += (gy - cursorSmooth.y) * gestureConfig.cursorSmoothing;
-            const smoothPointer = new THREE.Vector2(cursorSmooth.x * 2 - 1, -(cursorSmooth.y * 2 - 1));
-
-            // update hover using collider list to avoid ambiguous overlaps
-            raycaster.setFromCamera(smoothPointer, camera);
-            const hits = raycaster.intersectObjects(markerColliders, false);
-            const candidate = hits.length > 0 ? hits[0].object.userData.marker : null;
-            // require a brief hold for hover candidate to avoid flicker
-            if (candidate !== hoveredCandidate) { hoveredCandidate = candidate; hoverCandidateStart = performance.now(); }
-            else {
-                if (hoveredCandidate && (performance.now() - hoverCandidateStart > HOVER_HOLD_MS) && hoveredObject !== hoveredCandidate) {
-                    // commit hover change
-                    if (hoveredObject) {
-                        gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale, y: hoveredObject.userData.baseScale, duration: 0.18 });
-                        if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 1.8, y: hoveredObject.userData.baseScale * 1.8, duration: 0.22 });
-                        if (hoveredObject.userData.labelEl) gsap.to(hoveredObject.userData.labelEl, { opacity: 0, duration: 0.25, onComplete: () => hoveredObject.userData.labelEl.style.display = 'none' });
-                    }
-                    hoveredObject = hoveredCandidate;
-                    if (hoveredObject) {
-                        gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale * 1.5, y: hoveredObject.userData.baseScale * 1.5, duration: 0.18 });
-                        if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 2.6, y: hoveredObject.userData.baseScale * 2.6, duration: 0.24 });
-                        if (hoveredObject.userData.labelEl) { hoveredObject.userData.labelEl.style.display = 'block'; gsap.fromTo(hoveredObject.userData.labelEl, { opacity: 0 }, { opacity: 1, duration: 0.24 }); }
-                        canvasContainer.classList.add('interactive');
-                    } else { canvasContainer.classList.remove('interactive'); }
-                }
-            }
-
-            // --- Sticky proximity: compute nearest marker in screen space and snap cursor when close ---
-            try {
-                // only do sticky behavior when gesture mode is active
-                if (controlMode === 'gesture' && markerAnchors && markerAnchors.length) {
-                    let best = null; let bestDist = Infinity; let bestPx = { x: 0, y: 0 };
-                    const br = document.body.getBoundingClientRect(); const vw = br.width || window.innerWidth; const vh = br.height || window.innerHeight;
-                    for (let i = 0; i < markerAnchors.length; i++) {
-                        const anc = markerAnchors[i];
-                        if (!anc) continue;
-                        const wp = new THREE.Vector3(); anc.getWorldPosition(wp);
-                        wp.project(camera); // NDC
-                        // only consider visible markers
-                        if (wp.z > 1 || wp.x < -1 || wp.x > 1 || wp.y < -1 || wp.y > 1) continue;
-                        const px = (wp.x + 1) / 2 * vw; const py = (-wp.y + 1) / 2 * vh;
-                        const dx = px - (cursorSmooth.x * vw); const dy = py - (cursorSmooth.y * vh);
-                        const d = Math.hypot(dx, dy);
-                        if (d < bestDist) { bestDist = d; best = anc; bestPx = { x: px, y: py }; }
-                    }
-
-                    // engage sticky when within STICK_RADIUS_PX
-                    if (!stickyTarget && best && bestDist <= STICK_RADIUS_PX) {
-                        // anchors don't store marker directly; find the collider child that references the marker
-                        let markerRef = null;
-                        try {
-                            for (let ci = 0; ci < (best.children || []).length; ci++) {
-                                const ch = best.children[ci];
-                                if (ch && ch.userData && ch.userData.marker) { markerRef = ch.userData.marker; break; }
-                            }
-                        } catch(e) { markerRef = null; }
-                        // fallback: try to find marker by matching anchor reference
-                        if (!markerRef) markerRef = markers.find(m => m.userData && m.userData.anchor === best) || null;
-                        stickyTarget = { marker: markerRef, sx: bestPx.x, sy: bestPx.y, fired: false };
-                        stickyStart = performance.now();
-                        // haptic/visual cue and auto-click on engage
-                        try {
-                            // small audio pulse
-                            playClick();
-                        } catch(e){}
-                        try {
-                            const gc = ensureGestureCursor();
-                            if (window.gsap && typeof gsap.fromTo === 'function') {
-                                gsap.fromTo(gc, { scale: 1 }, { scale: 1.35, duration: 0.12, yoyo: true, repeat: 1, ease: 'power2.out' });
-                            } else {
-                                gc.style.transition = 'transform 120ms ease'; gc.style.transform = 'translate(-50%, -50%) scale(1.15)'; setTimeout(()=>{ try { gc.style.transform = 'translate(-50%, -50%) scale(1)'; } catch(e){} }, 160);
-                            }
-                        } catch(e){}
-                        // schedule the click after brief delay so visual pulse is noticeable
-                        try {
-                            (function(st){
-                                setTimeout(()=>{
-                                    try {
-                                        if (st && !st.fired) {
-                                                    st.fired = true;
-                                                    if (st.marker) {
-                                                        // set hoveredObject to marker sprite so onPointerClick behaves normally
-                                                        hoveredObject = st.marker;
-                                                        try { onPointerClick(); } catch(e) { console.warn('onPointerClick error', e); }
-                                                    }
-                                                }
-                                    } catch(e) { console.warn('auto-click failed', e); }
-                                }, 60);
-                            })(stickyTarget);
-                        } catch(e){}
-                    }
-
-                    // if sticky, check release conditions
-                    if (stickyTarget) {
-                        const curX = cursorSmooth.x * vw; const curY = cursorSmooth.y * vh;
-                        const distNow = Math.hypot(stickyTarget.sx - curX, stickyTarget.sy - curY);
-                        const locked = (performance.now() - stickyStart) < STICK_LOCK_MS;
-                        if (!locked && distNow > STICK_RELEASE_PX) {
-                            // release
-                            stickyTarget = null; stickyStart = 0;
-                        } else {
-                            // while sticky, snap the visible cursor and crosshair to the sticky target
-                            try {
-                                const gc = ensureGestureCursor();
-                                gc.style.left = stickyTarget.sx + 'px';
-                                gc.style.top = stickyTarget.sy + 'px';
-                                // also update overlay crosshair
-                                if (typeof __testMode !== 'undefined' && __testMode) {
-                                    const po = ensurePixelOverlay(); const cross = po.querySelector('.test-cross'); if (cross) { cross.style.left = stickyTarget.sx + 'px'; cross.style.top = stickyTarget.sy + 'px'; }
-                                }
-                            } catch(e){}
-                        }
-                    }
-                }
-            } catch(e) { console.warn('sticky-proximity error', e); }
-
-            // click-on-release behavior: record pinch start, but trigger click only on release to avoid accidental taps
-            if (isPinching && !wasPinching) {
-                // pinch started - capture stable Z and camera dist
-                pinchStartZ = (landmarks[8].z + landmarks[4].z) / 2;
-                cameraStartDist = camera.position.distanceTo(controls.target);
-            }
-            if (!isPinching && wasPinching) {
-                // pinch just released -> treat as click if held long enough and movement small
-                const held = (performance.now() - pinchHoldStart) > gestureConfig.pinchMinHold;
-                const moved = Math.abs(pinchFiltered - prevPinchFiltered) > 0.02; // too jittery
-                if (held && !moved && Date.now() - lastClickTime > 350) {
-                    if (hoveredObject) onPointerClick();
-                    else {
-                        const nearHits = raycaster.intersectObjects(markers, true);
-                        if (nearHits.length) { hoveredObject = nearHits[0].object; onPointerClick(); }
-                    }
-                    lastClickTime = Date.now(); try { playClick(); } catch(e) { try { clickAudio.currentTime = 0; clickAudio.play().catch(()=>{}); } catch(_){} } try { if (navigator.vibrate) navigator.vibrate(30); } catch(e){}
-                }
-                pinchHoldStart = 0;
-            }
-
-            // pinch drag for zoom: only when pinch is held and movement velocity is reasonable
-            if (isPinching && pinchStartZ !== null && cameraStartDist !== null) {
-                if (SLIDER_ONLY_CAMERA) {
-                    // slider controls camera distance; ignore gesture pinch zoom
-                } else {
-                const currentZ = (indexTip.z + thumbTip.z) / 2;
-                let dz = (pinchStartZ - currentZ);
-                if (gestureConfig.invertZoom) dz = -dz;
-                // guard against extreme dz spikes by clamping per-frame change
-                const maxDzPerFrame = 0.02;
-                dz = Math.max(-maxDzPerFrame, Math.min(maxDzPerFrame, dz));
-                // apply a gentler zoom scale for comfortable control
-                const effectiveScale = Math.max(gestureConfig.zoomScale * 0.6, 3000);
-                const newDist = cameraStartDist - dz * effectiveScale;
-                const clamped = Math.max(controls.minDistance, Math.min(controls.maxDistance, newDist));
-                const camDir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-                const targetPos = new THREE.Vector3().copy(controls.target).add(camDir.multiplyScalar(clamped));
-                gsap.to(camera.position, { x: targetPos.x, y: targetPos.y, z: targetPos.z, duration: 0.12, ease: 'power2.out' });
-                }
-            }
-            if (!isPinching) { pinchStartZ = null; cameraStartDist = null; }
-
-            // apply sensitivity and precision-mode adjustments
-            const effectiveSensitivity = (gestureConfig.sensitivity || 1.0);
-            // precision modifier: if precisionModeEnabled and a two-finger hold or special modifier detected, reduce sensitivity
-            const precisionActive = gestureConfig.precisionModeEnabled && isPinching && (pinchFiltered < (gestureConfig.pinchEnter * 0.9));
-            const finalSensitivity = precisionActive ? Math.max(0.18, effectiveSensitivity * 0.28) : effectiveSensitivity;
-
-            // wrist / palm rotation constrained to X-axis (pitch) only; horizontal movement controls zoom
-                if (lastHandPos) {
-                    const dx = (_smooth.x - lastHandPos.x);
-                    const dy = (_smooth.y - lastHandPos.y);
-                    // only pitch (rotation around camera-right / model X axis)
-                    const pitch = dy * gestureConfig.pitchScale * finalSensitivity;
-                    if (Math.abs(pitch) > 0.001) {
-                        const pivotPoint = controls.target.clone();
-                        // pitch around camera right axis (local)
-                        const camRight = new THREE.Vector3().subVectors(camera.position, controls.target).normalize().cross(new THREE.Vector3(0,1,0)).normalize();
-                        const qPitch = new THREE.Quaternion().setFromAxisAngle(camRight, pitch);
-                        const q = new THREE.Quaternion(); q.copy(qPitch);
-                        aircraftModel.position.sub(pivotPoint); aircraftModel.position.applyQuaternion(q); aircraftModel.position.add(pivotPoint);
-                        aircraftModel.quaternion.premultiply(q);
-                        camera.position.sub(pivotPoint); camera.position.applyQuaternion(q); camera.position.add(pivotPoint);
-                    }
-
-                    // horizontal hand movement -> zoom in/out (mapped to camera forward vector)
-                    const zoomDx = dx * finalSensitivity;
-                    const zoomThreshold = 0.0015; // small deadzone to avoid micro-movements
-                    if (Math.abs(zoomDx) > zoomThreshold) {
-                        if (!SLIDER_ONLY_CAMERA) {
-                            const camDir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-                            // positive dx -> zoom in (hand moved right) -> reduce distance
-                            const delta = -zoomDx * (gestureConfig.zoomXScale || 9000) * (gestureConfig.sensitivity || 1.0);
-                            const currentDist = camera.position.distanceTo(controls.target);
-                            const newDist = currentDist + delta;
-                            const clamped = Math.max(controls.minDistance, Math.min(controls.maxDistance, newDist));
-                            // apply smooth lerp to camera distance rather than GSAP tweening for per-frame stability
-                            const lerpAlpha = 0.28; // frame-based smoothing
-                            const desiredPos = new THREE.Vector3().copy(controls.target).add(camDir.multiplyScalar(clamped));
-                            camera.position.lerp(desiredPos, lerpAlpha);
-                        }
-                    }
-                }
-
-            // quick fist -> reset
-            const palmCenter = landmarks[9];
-            const fingertips = [landmarks[8], landmarks[12], landmarks[16], landmarks[20]];
-            const isFist = fingertips.every(tip => Math.hypot(tip.x - palmCenter.x, tip.y - palmCenter.y) < 0.09);
-            if (isFist) {
-                if (fistDetectedTime === 0) fistDetectedTime = Date.now();
-                if (Date.now() - fistDetectedTime > 700) { resetCamera(); fistDetectedTime = 0; }
-            } else { fistDetectedTime = 0; }
-
-            wasPinching = isPinching;
-            lastHandPos = { x: _smooth.x, y: _smooth.y, z: _smooth.z };
-        }
-
         // --- INTERACTION & ANIMATION ---
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
@@ -1633,19 +1064,21 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
         function updateHover(coords) {
             raycaster.setFromCamera(coords, camera);
             let newHoveredObject = null;
-            if (controlMode === 'gesture' && markerColliders.length > 0) {
+            
+            // Use marker colliders for intersection
+            if (markerColliders.length > 0) {
                 const colHits = raycaster.intersectObjects(markerColliders, false);
-                if (colHits.length) newHoveredObject = colHits[0].object.userData.marker;
-            } else {
-                const intersects = raycaster.intersectObjects(markers, false);
-                if (intersects.length) newHoveredObject = intersects[0].object;
+                if (colHits.length > 0 && colHits[0].object.userData.marker) {
+                    newHoveredObject = colHits[0].object.userData.marker;
+                }
             }
-            if (hoveredObject !== newHoveredObject) {
+
+            if (newHoveredObject !== hoveredObject) {
                 if (hoveredObject) {
-                    gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale, y: hoveredObject.userData.baseScale, duration: 0.2 });
-                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 2.1, y: hoveredObject.userData.baseScale * 2.1, duration: 0.3 });
-                    if (hoveredObject.userData.aura) gsap.to(hoveredObject.userData.aura.material, { opacity:0.55, duration:0.3 });
-                    if (hoveredObject && hoveredObject.userData && hoveredObject.userData.labelEl) { const _lbl = hoveredObject.userData.labelEl; gsap.to(_lbl, { opacity: 0, duration: 0.25, onComplete: () => { try { _lbl.style.display = 'none'; } catch(e){} } }); }
+                    gsap.to(hoveredObject.scale, { x: hoveredObject.userData.baseScale, y: hoveredObject.userData.baseScale, duration: 0.18 });
+                    if (hoveredObject.userData.glow) gsap.to(hoveredObject.userData.glow.scale, { x: hoveredObject.userData.baseScale * 1.8, y: hoveredObject.userData.baseScale * 1.8, duration: 0.18 });
+                    if (hoveredObject.userData.aura) gsap.to(hoveredObject.userData.aura.material, { opacity:0.38, duration:0.18 });
+                    if (hoveredObject.userData.labelEl) { hoveredObject.userData.labelEl.style.display = 'none'; gsap.to(hoveredObject.userData.labelEl, { opacity: 0, duration: 0.12 }); }
                 }
                 hoveredObject = newHoveredObject;
                 if (hoveredObject) {
@@ -1671,20 +1104,15 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
         function onPointerClick() {
             if (hoveredObject) {
                 const data = hoveredObject.userData.componentInfo;
-                updateInfoPanel(data);
-                // toggle selection ring visual
-                if (selectedObject && selectedObject.userData && selectedObject.userData.selectRing) {
-                    gsap.to(selectedObject.userData.selectRing.material, { opacity: 0.0, duration: 0.25 });
-                    if (selectedObject.userData.aura) gsap.to(selectedObject.userData.aura.material, { opacity:0.55, duration:0.3 });
-                }
+                if (!data) return;
                 selectedObject = hoveredObject;
-                if (selectedObject && selectedObject.userData && selectedObject.userData.selectRing) {
-                    gsap.to(selectedObject.userData.selectRing.material, { opacity: 1.0, duration: 0.28 });
-                    const m = selectedObject;
-                    const tl = gsap.timeline();
-                    tl.to(m.scale, { x: m.userData.baseScale*2.2, y: m.userData.baseScale*2.2, duration:0.18, ease:'power3.out'})
-                      .to(m.scale, { x: m.userData.baseScale*1.7, y: m.userData.baseScale*1.7, duration:0.28, ease:'power2.out'}, '>-0.02');
+                if (hoveredObject.userData.selectRing) gsap.to(hoveredObject.userData.selectRing.material, { opacity: 0.9, duration: 0.25 });
+                updateInfoPanel(data);
+                
+                const m = hoveredObject;
+                if (m) {
                     if (m.userData.glow) {
+                        const tl = gsap.timeline();
                         tl.to(m.userData.glow.scale, { x:m.userData.baseScale*3.2, y:m.userData.baseScale*3.2, duration:0.22, ease:'sine.out'}, 0)
                           .to(m.userData.glow.scale, { x:m.userData.baseScale*2.6, y:m.userData.baseScale*2.6, duration:0.35, ease:'power2.out'}, '>-0.05');
                     }
@@ -1718,7 +1146,6 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
             if (selectedObject && selectedObject.userData && selectedObject.userData.selectRing) gsap.to(selectedObject.userData.selectRing.material, { opacity: 0.0, duration: 0.25 });
             selectedObject = null;
             controls.enabled = false;
-            // When using slider-only camera, reset target but do not override camera distance; otherwise restore full camera position
             if (SLIDER_ONLY_CAMERA) {
                 gsap.to(controls.target, { x: initialControlsTarget.x, y: initialControlsTarget.y, z: initialControlsTarget.z, duration: 0.9, ease: 'power3.inOut', onComplete: () => { controls.enabled = true; }});
             } else {
@@ -1744,7 +1171,6 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                 gsap.fromTo("#info-faultcode", {innerText: ""}, { duration: 0.5, text: data.faultCode || '', ease: "none" });
                 gsap.fromTo("#info-description", {innerText: ""}, { duration: 1.0, text: data.descriptionText, ease: "none" });
 
-                // small debug: log the faultCode that we're attempting to show (helps diagnose visibility issues)
                 try { console.debug && console.debug('updateInfoPanel faultCode:', data && data.faultCode); } catch(e) {}
 
                 infoPanel.classList.add('visible');
@@ -1758,8 +1184,8 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
         let aiHistory = [];
 
         // --- EVENT LISTENERS ---
-        window.addEventListener('pointermove', (e) => { if (controlMode === 'mouse') onPointerMove(e); });
-        window.addEventListener('click', (e) => { if (controlMode === 'mouse') onPointerClick(e); });
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('click', onPointerClick);
         document.getElementById('info-close').addEventListener('click', (e) => { e.stopPropagation(); resetCamera(); });
 
         // keyboard toggle (press 'g' to toggle gesture control)
@@ -1815,7 +1241,7 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
                 }
             } else if (e.key === 'f' || e.key === 'F') {
                 // toggle flight selector UI
-                const sel = document.getElementById('flight-selector');
+                const sel = document.getElementById('vehicle-selector');
                 if (sel) sel.style.display = (sel.style.display === 'none' || sel.style.display === '') ? 'block' : 'none';
             }
         });
@@ -1903,54 +1329,6 @@ STYLE: Punchy, analytic, no fluff. Avoid repeating raw numbers without interpret
             renderer.render(scene, camera);
         }
         animate();
-
-        // Camera slider wiring: keeps camera distance controlled by the slider only when SLIDER_ONLY_CAMERA is true
-        function initCameraSlider() {
-            const slider = document.getElementById('camera-zoom-slider');
-            const valEl = document.getElementById('camera-zoom-val');
-            if (!slider || !valEl) return;
-            // helper to compute current distance
-            function currentDist() { return camera.position.distanceTo(controls.target); }
-            // clamp slider to controls min/max
-            slider.min = Math.max(20, controls.minDistance || 20);
-            slider.max = Math.max(slider.min + 10, controls.maxDistance || 60000);
-            slider.step = Math.max(1, Math.round((slider.max - slider.min) / 1000));
-            // set initial slider value from camera
-            slider.value = Math.round(currentDist());
-            valEl.innerText = `${Math.round(slider.value)}m`;
-
-            let sliderActive = false;
-            slider.addEventListener('input', (e) => {
-                const d = Number(e.target.value);
-                valEl.innerText = `${Math.round(d)}m`;
-                // compute new camera position along current camera-forward vector
-                const camDir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-                const newPos = controls.target.clone().add(camDir.multiplyScalar(d));
-                camera.position.copy(newPos);
-                sliderActive = true;
-            });
-
-            // when user stops interacting, ensure controls.update() and enforce slider value matches camera
-            slider.addEventListener('change', (e) => {
-                const d = Number(e.target.value);
-                valEl.innerText = `${Math.round(d)}m`;
-                // broadcast change to other parts of the code
-                try { window.dispatchEvent(new CustomEvent('camera-distance-changed', { detail: { distance: d } })); } catch(e){}
-                sliderActive = false;
-            });
-
-            // keep the slider in-sync in case other code updates camera (should be avoided when SLIDER_ONLY_CAMERA=true)
-            setInterval(() => {
-                try {
-                    if (!sliderActive) {
-                        const d = Math.round(currentDist());
-                        if (Math.abs(Number(slider.value) - d) > 3) {
-                            slider.value = d; valEl.innerText = `${Math.round(d)}m`;
-                        }
-                    }
-                } catch(e){}
-            }, 250);
-        }
 
         // -----------------------
         // Tutorial / Onboarding

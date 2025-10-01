@@ -1,7 +1,7 @@
 {
-  "name": "a400-webapp",
+  "name": "bmw-fleet-monitor",
   "version": "0.1.0",
-  "description": "A400M interactive viewer with gesture support served from Node.js",
+  "description": "BMW X5M Fleet Monitor - Interactive 3D vehicle management system with gesture support",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
